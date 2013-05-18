@@ -5,13 +5,11 @@
 Catbug рабоатет следующим образом:
 
   1. описываете деревце
-  2. и потом как-бы Чпок! и всё у вас в кармане
+  2. и потом как-бы *Чпок!* и всё у вас в кармане
 
 например:
 
 ```html
-<!-- HTML -->
-
 <div class=js-spoiler>
   <button class=js-toggle>toggle</button>
   <p class=js-content>лорем ипсум долор сит амет</p>
@@ -23,8 +21,6 @@ Catbug рабоатет следующим образом:
 ```
 
 ```coffee
-# coffeescript
-
 catbug """
   .js-spoiler
     .js-toggle
@@ -41,10 +37,10 @@ catbug """
 Имя каждого элемента вычисляется из селектора, но может быть задано вручную
 (`.some-selector (name=foo)`):
 
-   .js-toggle                     ->  @toggle
-   .toggle span                   ->  @toggleSpan
-   input[type=text]               ->  @inputTypeText
-   input[type=text] (name=field)  ->  @field
+    .js-toggle                     ->  @toggle
+    .toggle span                   ->  @toggleSpan
+    input[type=text]               ->  @inputTypeText
+    input[type=text] (name=field)  ->  @field
 
 Корневой элемент доступен в инициализаторе под именем `@root`.
 
@@ -67,4 +63,5 @@ catbug """
 $('.js-my-module').catbug('my-module').apiMethod()
 ```
 
-Т.е. можно сделать какой-то API для своего модуля.
+Т.е. можно сделать какой-то API для своего модуля, к которому можно будет
+получить доступ через функцию `jQuery`: `api = $(...).catbug(moduleName)`.
