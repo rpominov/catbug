@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Catbug demo</title>
+  </head>
+  <body>
+
+
+    <script src="../components/underscore/underscore.js"></script>
+    <script src="../components/jquery/jquery.js"></script>
+    <script src="../catbug.js"></script>
+
+    <script src="../components/coffee-script/extras/coffee-script.js"></script>
+
+    <script type="text/coffeescript">
+      console.log catbug.treeParser.parse """
+        .js-some-module
+          .js-ololo
+          .js-another(name="ooo" some something=lll)
+            & .js-lalal
+              & .js-ololo
+      """
+    </script>
+  </body>
+</html>
