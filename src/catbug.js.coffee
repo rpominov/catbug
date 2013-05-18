@@ -4,10 +4,10 @@
 # = require core
 
 window.catbug = ->
-  catbug.module.apply catbug, arguments
+  catbug.core.module.apply catbug, arguments
 
 catbug.ns = (path, cb) ->
   node = this
   for part in path.split('.') when part
     node = (node[part] or= {})
-  cb.call node, this
+  cb node, this
