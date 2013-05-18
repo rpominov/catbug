@@ -65,3 +65,12 @@ $('.js-my-module').catbug('my-module').apiMethod()
 
 Т.е. можно сделать какой-то API для своего модуля, к которому можно будет
 получить доступ через функцию `jQuery`: `api = $(...).catbug(moduleName)`.
+
+
+## Установка
+
+Для работы catbag'у нужны jQuery и underscore.js:
+
+    <script src=".../underscore.js"></script>
+    <script src=".../jquery.js"></script>
+    <script src=".../catbug.js"></script>
