@@ -1,5 +1,5 @@
 /*! catbug.js 0.0.0
- *  2013-05-19 01:08:36 +0400
+ *  2013-05-19 02:00:43 +0400
  *  https://github.com/pozadi/catbug.js
  */
 
@@ -229,12 +229,14 @@ catbug.ns('core', function(ns, top) {
       var method, result, _i, _len, _ref;
 
       result = {};
-      _ref = ['find', 'on', 'off', 'data'];
+      _ref = ['find', 'on', 'off', 'data', 'addClass', 'removeClass', 'toggleClass', 'hide', 'show', 'toggle'];
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         method = _ref[_i];
         result[method] = _.bind(rootEl[method], rootEl);
       }
-      return _.extend(result, this.jqueries(rootEl));
+      return _.extend(result, {
+        root: rootEl
+      }, this.jqueries(rootEl));
     };
 
     Module.prototype.init = function(el) {

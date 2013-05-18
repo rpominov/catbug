@@ -14,9 +14,10 @@ catbug.ns 'core', (ns, top) ->
 
     builderContext: (rootEl) ->
       result = {}
-      for method in ['find', 'on', 'off', 'data']
+      for method in ['find', 'on', 'off', 'data', 'addClass', 'removeClass',
+                     'toggleClass', 'hide', 'show', 'toggle']
         result[method] = _.bind rootEl[method], rootEl
-      _.extend result, @jqueries rootEl
+      _.extend result, {root: rootEl}, @jqueries rootEl
 
     init: (el) ->
       el = $ el
