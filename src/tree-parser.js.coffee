@@ -1,10 +1,11 @@
 catbug.ns 'treeParser', (ns) ->
 
-  ns.attrDelimiter = /\s+/
   ns.sideQuotes = /^["']|["']$/g
   ns.nonEmpty = /\S+/
   ns.indentation = /^\s+/
   ns.selectorAndAttrs = /^([^\(\)]+)(?:\(([^\(\)]+)\))?$/
+  ns.attribute = /([a-z_-]+)(?:=(?:\"(.*?)\"|\'(.*?)\'|(\S+)))?/
+  ns.attributes = new RegExp(ns.attribute.source, 'g')
 
   ns.parseToRaw = (treeString) ->
 
@@ -71,9 +72,11 @@ catbug.ns 'treeParser', (ns) ->
   ns.parseAttributes = (attributes) ->
     result = {}
     if attributes
-      for attr in attributes.split ns.attrDelimiter
-        [name, value] = attr.split '='
-        result[name] = value?.replace ns.sideQuotes, ''
+      for attr in attributes.match ns.attributes
+        tmp = ns.attribute.exec attr
+        name = tmp[1]
+        value = tmp[4] or tmp[3] or tmp[2]
+        result[name] = value
     result
 
   ns.parseLine = (line) ->
@@ -85,11 +88,11 @@ catbug.ns 'treeParser', (ns) ->
     attributes: ns.parseAttributes parts[2]
 
   ns.selectorToName = (selector) ->
-      $.camelCase selector
-        .replace(/[^a-z0-9]+/ig, '-')
-        .replace(/^-/, '')
-        .replace(/-$/, '')
-        .replace(/^js-/, '')
+    $.camelCase selector
+      .replace(/[^a-z0-9]+/ig, '-')
+      .replace(/^-/, '')
+      .replace(/-$/, '')
+      .replace(/^js-/, '')
 
   ns.genName = (element) ->
     if element.attributes.name
@@ -108,9 +111,6 @@ catbug.ns 'treeParser', (ns) ->
     for element in elements
       _.extend element, ns.parseLine element.data
       element.selector = element.selector.replace '&', element.parent?.selector
-
-    elements = _.map elements, (e) ->
-      _.pick e, 'selector', 'attributes', 'level'
 
     _.each elements, ns.genName
 

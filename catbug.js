@@ -1,5 +1,5 @@
 /*! catbug.js 0.1.0
- *  2013-05-19 18:08:36 +0400
+ *  2013-05-19 22:01:48 +0400
  *  https://github.com/pozadi/catbug.js
  */
 
@@ -28,11 +28,12 @@ catbug.ns = function(path, cb) {
 /***  src/tree-parser  ***/
 
 catbug.ns('treeParser', function(ns) {
-  ns.attrDelimiter = /\s+/;
   ns.sideQuotes = /^["']|["']$/g;
   ns.nonEmpty = /\S+/;
   ns.indentation = /^\s+/;
   ns.selectorAndAttrs = /^([^\(\)]+)(?:\(([^\(\)]+)\))?$/;
+  ns.attribute = /([a-z_-]+)(?:=(?:\"(.*?)\"|\'(.*?)\'|(\S+)))?/;
+  ns.attributes = new RegExp(ns.attribute.source, 'g');
   ns.parseToRaw = function(treeString) {
     var getLevel, getRoots, lines, nonEmpty, normalize;
 
@@ -120,15 +121,17 @@ catbug.ns('treeParser', function(ns) {
     return result;
   };
   ns.parseAttributes = function(attributes) {
-    var attr, name, result, value, _i, _len, _ref, _ref1;
+    var attr, name, result, tmp, value, _i, _len, _ref;
 
     result = {};
     if (attributes) {
-      _ref = attributes.split(ns.attrDelimiter);
+      _ref = attributes.match(ns.attributes);
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         attr = _ref[_i];
-        _ref1 = attr.split('='), name = _ref1[0], value = _ref1[1];
-        result[name] = value != null ? value.replace(ns.sideQuotes, '') : void 0;
+        tmp = ns.attribute.exec(attr);
+        name = tmp[1];
+        value = tmp[4] || tmp[3] || tmp[2];
+        result[name] = value;
       }
     }
     return result;
@@ -168,9 +171,6 @@ catbug.ns('treeParser', function(ns) {
       _.extend(element, ns.parseLine(element.data));
       element.selector = element.selector.replace('&', (_ref = element.parent) != null ? _ref.selector : void 0);
     }
-    elements = _.map(elements, function(e) {
-      return _.pick(e, 'selector', 'attributes', 'level');
-    });
     _.each(elements, ns.genName);
     return {
       root: _.findWhere(elements, {

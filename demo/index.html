@@ -42,6 +42,12 @@
 
         sayHello: =>
           @content.show()
+
+      console.log catbug.treeParser.parse """
+        foo (foo=bar)
+          bar (foo=bar bar="baz" baz='foo' alone)
+          baz (foo="bar baz" bar baz="foo='foo'")
+      """
     </script>
   </body>
 </html>
