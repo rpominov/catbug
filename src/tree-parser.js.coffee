@@ -2,9 +2,27 @@ catbug.ns 'treeParser', (ns) ->
 
   ns.nonEmpty = /\S+/
   ns.indentation = /^\s+/
-  ns.selectorAndAttrs = /^([^\(\)]+)(?:\(([^\(\)]+)\))?$/
-  ns.attribute = /([a-z_-]+)(?:=(?:"(.*?)"|'(.*?)'|(\S+)))?/
+  ns.selectorAndAttrs = ///^
+    ([^\(]+)
+    (?:
+      \( (.*?) \)
+    )?
+  $///
+  ns.attribute = ///
+    ([a-z_-]+)
+    (?:
+      =(?:
+        "(.*?)" |
+        '(.*?)' |
+         (\S+)
+      )
+    )?
+  ///
   ns.attributes = new RegExp(ns.attribute.source, 'g')
+  ns.comments = ///
+    /\*[\s\S]*?\*/ |
+    //.*
+  ///g
 
   ns.parseToRaw = (treeString) ->
 
@@ -47,6 +65,8 @@ catbug.ns 'treeParser', (ns) ->
       addCurrent()
 
       result
+
+    treeString = treeString.replace ns.comments, ''
 
     lines = _.chain(treeString.split '\n')
       .filter(nonEmpty)

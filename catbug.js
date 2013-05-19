@@ -1,5 +1,5 @@
 /*! catbug.js 0.1.0
- *  2013-05-19 23:15:40 +0400
+ *  2013-05-20 01:16:50 +0400
  *  https://github.com/pozadi/catbug.js
  */
 
@@ -30,9 +30,10 @@ catbug.ns = function(path, cb) {
 catbug.ns('treeParser', function(ns) {
   ns.nonEmpty = /\S+/;
   ns.indentation = /^\s+/;
-  ns.selectorAndAttrs = /^([^\(\)]+)(?:\(([^\(\)]+)\))?$/;
+  ns.selectorAndAttrs = /^([^\(]+)(?:\((.*?)\))?$/;
   ns.attribute = /([a-z_-]+)(?:=(?:"(.*?)"|'(.*?)'|(\S+)))?/;
   ns.attributes = new RegExp(ns.attribute.source, 'g');
+  ns.comments = /\/\*[\s\S]*?\*\/|\/\/.*/g;
   ns.parseToRaw = function(treeString) {
     var getLevel, getRoots, lines, nonEmpty, normalize;
 
@@ -97,6 +98,7 @@ catbug.ns('treeParser', function(ns) {
       addCurrent();
       return result;
     };
+    treeString = treeString.replace(ns.comments, '');
     lines = _.chain(treeString.split('\n')).filter(nonEmpty).map(getLevel).value();
     normalize(lines);
     return getRoots(lines, null);
