@@ -1,6 +1,5 @@
 catbug.ns 'treeParser', (ns) ->
 
-  ns.sideQuotes = /^["']|["']$/g
   ns.nonEmpty = /\S+/
   ns.indentation = /^\s+/
   ns.selectorAndAttrs = /^([^\(\)]+)(?:\(([^\(\)]+)\))?$/
