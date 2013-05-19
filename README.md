@@ -74,12 +74,18 @@ $('.js-my-module').catbug('my-module').apiMethod()
 будет готов. Но можно повторить инициализацию если появились новые эелемненты.
 При этом на старых элементах повторной инициализации не произойдет.
 
-Код `catbug.init('my-module')` проинициализирует модуль `my-module`.
-`catbug.init('my-module another')` проинициализирует `my-module` и `another`.
-`catbug.initAll()` проинициализирует все модули.
+```coffee
+catbug.init 'my-module'          # будет проинициализирован модуль с именем "my-module"
+catbug.init 'my-module another'  # — модули "my-module" и "another"
+catbug.initAll()                 # — все модули
+```
 
 Можно проинициализировать модуль на элементе не подходящем под его
-корневой селектор: `$(...).catbug('my-module')`.
+корневой селектор:
+
+```coffee
+$('.js-some').catbug('my-module') # инициализируем "my-module" на произвольном элементе
+```
 
 
 ## Работа с элементами
