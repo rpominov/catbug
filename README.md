@@ -72,3 +72,15 @@ $('.js-my-module').catbug('my-module').apiMethod()
     <script src=".../underscore.js"></script>
     <script src=".../jquery.js"></script>
     <script src=".../catbug.js"></script>
+
+
+## Разработка
+
+    npm install -g grunt-cli
+    npm install -g bower
+
+    npm install
+    bower install
+
+    grunt watch &
+    open demo/index.html
