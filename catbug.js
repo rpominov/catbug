@@ -1,5 +1,5 @@
 /*! catbug.js 0.0.0
- *  2013-05-19 02:00:43 +0400
+ *  2013-05-19 17:59:37 +0400
  *  https://github.com/pozadi/catbug.js
  */
 
@@ -204,6 +204,53 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
 
 catbug.ns('core', function(ns, top) {
   ns.instances = {};
+  ns.elementMixin = {
+    update: function() {
+      var el, _i, _len, _ref;
+
+      this.splice(0, this.length);
+      _ref = $(this.selector, this.context);
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        el = _ref[_i];
+        this.push(el);
+      }
+      return this;
+    },
+    byChild: function(child) {
+      return $(child).parents(this.selector);
+    },
+    byParent: function(parent) {
+      if (parent.jquery) {
+        parent = parent.get(0);
+      }
+      return this.filter(function() {
+        return $.contains(parent, this);
+      });
+    }
+  };
+  ns.builderContextMixin = {
+    update: function(names) {
+      var info, name, _i, _j, _len, _len1, _ref, _ref1, _results, _results1;
+
+      if (names) {
+        _ref = names.split(' ');
+        _results = [];
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          name = _ref[_i];
+          _results.push(this[name].update());
+        }
+        return _results;
+      } else {
+        _ref1 = this.__elements;
+        _results1 = [];
+        for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
+          info = _ref1[_j];
+          _results1.push(this[info.name].update());
+        }
+        return _results1;
+      }
+    }
+  };
   ns.Module = (function() {
     function Module(name, rootSelector, elements, builder) {
       this.name = name;
@@ -213,14 +260,18 @@ catbug.ns('core', function(ns, top) {
       this.initAll = __bind(this.initAll, this);
     }
 
-    Module.prototype.jqueries = function(context) {
+    Module.prototype.buildElement = function(selector, context) {
+      return _.extend($(selector, context), ns.elementMixin);
+    };
+
+    Module.prototype.buildElements = function(context) {
       var info, result, _i, _len, _ref;
 
       result = {};
       _ref = this.elements;
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         info = _ref[_i];
-        result[info.name] = $(info.selector, context);
+        result[info.name] = this.buildElement(info.selector, context);
       }
       return result;
     };
@@ -235,8 +286,9 @@ catbug.ns('core', function(ns, top) {
         result[method] = _.bind(rootEl[method], rootEl);
       }
       return _.extend(result, {
-        root: rootEl
-      }, this.jqueries(rootEl));
+        root: rootEl,
+        __elements: this.elements
+      }, ns.builderContextMixin, this.buildElements(rootEl));
     };
 
     Module.prototype.init = function(el) {
@@ -265,15 +317,15 @@ catbug.ns('core', function(ns, top) {
     return Module;
 
   })();
-  return ns.module = function(tree, name, constructor) {
+  return ns.module = function(tree, name, builder) {
     var module;
 
-    if (constructor == null) {
-      constructor = name;
+    if (builder == null) {
+      builder = name;
       name = _.uniqueId('lambda-');
     }
     tree = top.treeParser.parse(tree);
-    ns.instances[name] = module = new ns.Module(name, tree.root.selector, tree.elements, constructor);
+    ns.instances[name] = module = new ns.Module(name, tree.root.selector, tree.elements, builder);
     return $(module.initAll);
   };
 });

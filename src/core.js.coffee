@@ -2,14 +2,35 @@ catbug.ns 'core', (ns, top) ->
 
   ns.instances = {}
 
+  ns.elementMixin =
+    update: ->
+      @splice 0, @length
+      @push el for el in $(@selector, @context)
+      @
+    byChild: (child) ->
+      $(child).parents @selector
+    byParent: (parent) ->
+      parent = parent.get(0) if parent.jquery
+      @filter -> $.contains parent, @
+
+  ns.builderContextMixin =
+    update: (names) ->
+      if names
+        @[name].update() for name in names.split ' '
+      else
+        @[info.name].update() for info in @__elements
+
   class ns.Module
 
     constructor: (@name, @rootSelector, @elements, @builder) ->
 
-    jqueries: (context) ->
+    buildElement: (selector, context) ->
+      _.extend $(selector, context), ns.elementMixin
+
+    buildElements: (context) ->
       result = {}
       for info in @elements
-        result[info.name] = $ info.selector, context
+        result[info.name] = @buildElement info.selector, context
       result
 
     builderContext: (rootEl) ->
@@ -17,7 +38,10 @@ catbug.ns 'core', (ns, top) ->
       for method in ['find', 'on', 'off', 'data', 'addClass', 'removeClass',
                      'toggleClass', 'hide', 'show', 'toggle']
         result[method] = _.bind rootEl[method], rootEl
-      _.extend result, {root: rootEl}, @jqueries rootEl
+      _.extend result, {
+        root: rootEl
+        __elements: @elements
+      }, ns.builderContextMixin, @buildElements rootEl
 
     init: (el) ->
       el = $ el
@@ -30,10 +54,10 @@ catbug.ns 'core', (ns, top) ->
       for el in $ @rootSelector
         @init el
 
-  ns.module = (tree, name, constructor) ->
+  ns.module = (tree, name, builder) ->
 
-    unless constructor?
-      constructor = name
+    unless builder?
+      builder = name
       name = _.uniqueId 'lambda-'
 
     tree = top.treeParser.parse tree
@@ -42,7 +66,7 @@ catbug.ns 'core', (ns, top) ->
       name,
       tree.root.selector,
       tree.elements,
-      constructor
+      builder
     )
 
     $ module.initAll
