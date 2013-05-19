@@ -8,17 +8,18 @@ catbug.ns 'core', (ns, top) ->
       @push el for el in $(@selector, @context)
       @
     byChild: (child) ->
-      $(child).parents @selector
+      child = child.get(0) if child.jquery
+      @filter -> $.contains @, child
     byParent: (parent) ->
       parent = parent.get(0) if parent.jquery
       @filter -> $.contains parent, @
 
   ns.builderContextMixin =
     update: (names) ->
-      if names
-        @[name].update() for name in names.split ' '
-      else
-        @[info.name].update() for info in @__elements
+      @[name].update() for name in names.split ' '
+    updateAll: ->
+      @[info.name].update() for info in @__elements
+
 
   class ns.Module
 

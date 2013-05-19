@@ -1,5 +1,5 @@
 /*! catbug.js 0.1.0
- *  2013-05-19 22:52:25 +0400
+ *  2013-05-19 23:15:40 +0400
  *  https://github.com/pozadi/catbug.js
  */
 
@@ -216,7 +216,12 @@ catbug.ns('core', function(ns, top) {
       return this;
     },
     byChild: function(child) {
-      return $(child).parents(this.selector);
+      if (child.jquery) {
+        child = child.get(0);
+      }
+      return this.filter(function() {
+        return $.contains(this, child);
+      });
     },
     byParent: function(parent) {
       if (parent.jquery) {
@@ -229,25 +234,26 @@ catbug.ns('core', function(ns, top) {
   };
   ns.builderContextMixin = {
     update: function(names) {
-      var info, name, _i, _j, _len, _len1, _ref, _ref1, _results, _results1;
+      var name, _i, _len, _ref, _results;
 
-      if (names) {
-        _ref = names.split(' ');
-        _results = [];
-        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-          name = _ref[_i];
-          _results.push(this[name].update());
-        }
-        return _results;
-      } else {
-        _ref1 = this.__elements;
-        _results1 = [];
-        for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
-          info = _ref1[_j];
-          _results1.push(this[info.name].update());
-        }
-        return _results1;
+      _ref = names.split(' ');
+      _results = [];
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        name = _ref[_i];
+        _results.push(this[name].update());
       }
+      return _results;
+    },
+    updateAll: function() {
+      var info, _i, _len, _ref, _results;
+
+      _ref = this.__elements;
+      _results = [];
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        info = _ref[_i];
+        _results.push(this[info.name].update());
+      }
+      return _results;
     }
   };
   ns.Module = (function() {
