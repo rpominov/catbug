@@ -132,7 +132,7 @@
           .js-new-item
           .js-item-list
             .js-todo-item
-              & [type=checkbox] (name=itemCheckbox)
+              & [type=checkbox] (name=itemCheckbox) // just example
               .js-item-text
               .js-item-remove
               .js-item-field
@@ -221,7 +221,7 @@
         setFilter('all')
         updateStats()
 
-        {setFilter, addItem, updateItem, setCompleted, removeItem, setFilter}
+        {setFilter, addItem, removeItem, updateItem, setCompleted}
     </script>
   </body>
 </html>
