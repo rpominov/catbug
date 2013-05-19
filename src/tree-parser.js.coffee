@@ -4,7 +4,7 @@ catbug.ns 'treeParser', (ns) ->
   ns.nonEmpty = /\S+/
   ns.indentation = /^\s+/
   ns.selectorAndAttrs = /^([^\(\)]+)(?:\(([^\(\)]+)\))?$/
-  ns.attribute = /([a-z_-]+)(?:=(?:\"(.*?)\"|\'(.*?)\'|(\S+)))?/
+  ns.attribute = /([a-z_-]+)(?:=(?:"(.*?)"|'(.*?)'|(\S+)))?/
   ns.attributes = new RegExp(ns.attribute.source, 'g')
 
   ns.parseToRaw = (treeString) ->
