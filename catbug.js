@@ -1,5 +1,5 @@
 /*! catbug.js 0.1.0
- *  2013-05-19 22:11:25 +0400
+ *  2013-05-19 22:52:25 +0400
  *  https://github.com/pozadi/catbug.js
  */
 
@@ -316,7 +316,7 @@ catbug.ns('core', function(ns, top) {
     return Module;
 
   })();
-  return ns.module = function(tree, name, builder) {
+  ns.module = function(tree, name, builder) {
     var module;
 
     if (builder == null) {
@@ -326,5 +326,27 @@ catbug.ns('core', function(ns, top) {
     tree = top.treeParser.parse(tree);
     ns.instances[name] = module = new ns.Module(name, tree.root.selector, tree.elements, builder);
     return $(module.initAll);
+  };
+  top.init = function(names) {
+    var name, result, _i, _len, _ref;
+
+    result = {};
+    _ref = names.split(' ');
+    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+      name = _ref[_i];
+      result[name] = ns.instances[name].initAll();
+    }
+    return result;
+  };
+  return top.initAll = function() {
+    var module, name, result, _ref;
+
+    result = {};
+    _ref = ns.instances;
+    for (name in _ref) {
+      module = _ref[name];
+      result[name] = module.initAll();
+    }
+    return result;
   };
 });

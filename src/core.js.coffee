@@ -70,3 +70,17 @@ catbug.ns 'core', (ns, top) ->
     )
 
     $ module.initAll
+
+  top.init = (names) ->
+    result = {}
+    for name in names.split ' '
+      result[name] = ns.instances[name].initAll()
+    result
+
+  top.initAll = ->
+    result = {}
+    for name, module of ns.instances
+      result[name] = module.initAll()
+    result
+
+
