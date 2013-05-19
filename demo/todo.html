@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Catbug demo | ToDo</title>
+
+    <style type="text/css">
+      .todos-widget {
+        width: 500px;
+        margin: 0 auto;
+        font-size: 20px;
+        line-height: 1.5;
+      }
+        .item-list {
+          list-style: none;
+          margin: 0;
+          padding: 0;
+        }
+          .todo-item,
+          .add-form {
+            background: #8ee699;
+            padding: 4px 6px;
+          }
+            .todo-item [type=text],
+            .add-form [type=text] {
+              width: 90%;
+              font-size: 20px;
+              padding: 5px 7px;
+            }
+              .remove {
+                float: right;
+              }
+              .todo-item [type=text] {
+                display: none;
+              }
+              .todo-item.edit .remove,
+              .todo-item.edit .text,
+              .todo-item.edit [type=checkbox] {
+                display: none;
+              }
+              .todo-item.edit [type=text] {
+                display: inline;
+              }
+              .todo-item.completed .text {
+                text-decoration: line-through;
+              }
+            .todos-widget.filter-completed .todo-item.active {
+              display: none;
+            }
+            .todos-widget.filter-active .todo-item.completed {
+              display: none;
+            }
+        .footer {
+          background: #63c26f;
+          margin: 0 4px;
+          font-size: 14px;
+          padding: 5px 7px;
+        }
+          .left {
+            float: left;
+          }
+          .clear-completed {
+            float: right;
+          }
+          .footer-menu {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            text-align: center;
+          }
+            .footer-menu li {
+              display: inline;
+            }
+              .todos-widget.filter-all [data-filter=all] {
+                font-weight: bold;
+              }
+              .todos-widget.filter-completed [data-filter=completed] {
+                font-weight: bold;
+              }
+              .todos-widget.filter-active [data-filter=active] {
+                font-weight: bold;
+              }
+    </style>
+  </head>
+  <body>
+
+    <div class="js-todos-widget todos-widget">
+      <h1>todos</h1>
+
+      <div class="add-form">
+        <input type="checkbox" class="js-all-checkbox">
+        <input type="text" placeholder="What needs to be done?" class="js-new-item">
+      </div>
+
+      <ul class="js-item-list item-list">
+      </ul>
+
+      <div class="footer js-footer">
+        <span class="js-left-counter left"></span>
+
+        <button class="js-clear-completed clear-completed">Clear completed
+          (<span class="js-completed-counter"></span>)</button>
+
+        <ul class="footer-menu">
+          <li><button class="js-set-filter-button" data-filter="all">All</button></li>
+          <li><button class="js-set-filter-button" data-filter="active">Active</button></li>
+          <li><button class="js-set-filter-button" data-filter="completed">Completed</button></li>
+        </ul>
+      </div>
+
+      <script type="text/html" class="js-item-template">
+        <li class="js-todo-item todo-item">
+          <input type="checkbox" class="js-item-checkbox">
+          <span class="js-item-text text"></span>
+          <button class="js-item-remove remove">&times;</button>
+          <input type="text" class="js-item-field">
+        </li>
+      </script>
+    </div>
+
+    <script src="../components/underscore/underscore.js"></script>
+    <script src="../components/jquery/jquery.js"></script>
+    <script src="../catbug.js"></script>
+
+    <script src="../components/coffee-script/extras/coffee-script.js"></script>
+
+    <script type="text/coffeescript">
+
+      catbug """
+        .js-todos-widget
+          .js-all-checkbox
+          .js-new-item
+          .js-item-list
+            .js-todo-item
+              & [type=checkbox] (name=itemCheckbox)
+              .js-item-text
+              .js-item-remove
+              .js-item-field
+          .js-footer
+            .js-left-counter
+            .js-clear-completed
+              .js-completed-counter
+            .js-set-filter-button
+          .js-item-template
+      """, ->
+
+        onEnter = (fn) ->
+          (e) -> fn.apply(@, arguments) if e.which == 13
+
+        itemSubTree = 'todoItem itemCheckbox itemText itemRemove itemField'
+        itemTpl = $.trim @itemTemplate.html()
+
+        addItem = (text) =>
+          todoItem = $(itemTpl)
+          @itemList.append(todoItem)
+          @update itemSubTree
+          updateItem(todoItem, text)
+          setCompleted(todoItem, false)
+
+        updateItem = (todoItem, text) =>
+          @itemText.byParent(todoItem).text text
+          @itemField.byParent(todoItem).val text
+
+        setCompleted = (todoItem, completed) =>
+          $(todoItem)
+            .removeClass('active completed')
+            .addClass(if completed then 'completed' else 'active')
+          @itemCheckbox.byParent(todoItem).prop 'checked', completed
+          updateStats()
+
+        removeItem = (todoItem) =>
+          todoItem.remove()
+          @update itemSubTree
+          updateStats()
+
+        setFilter = (filter) =>
+          @removeClass('filter-completed filter-active filter-all')
+          @addClass("filter-#{filter}")
+
+        updateStats = =>
+          all = @todoItem.length
+          completed = @todoItem.filter('.completed').length
+          active = all - completed
+          @footer.toggle(all > 0)
+          @clearCompleted.toggle(completed > 0)
+          @completedCounter.text(completed)
+          @leftCounter.text("#{active} #{if active == 1 then 'item' else 'items'} left")
+
+        @newItem.keyup onEnter =>
+          addItem @newItem.val()
+          @newItem.val('')
+
+        @allCheckbox.change =>
+          completed = @allCheckbox.prop('checked')
+          setCompleted(todoItem, completed) for todoItem in @todoItem
+
+        @clearCompleted.click =>
+          removeItem(todoItem) for todoItem in @todoItem.filter('.completed')
+
+        @setFilterButton.click ({target}) =>
+          setFilter $(target).data('filter')
+
+        @on 'change', @itemCheckbox.selector, ({target}) =>
+          todoItem = @todoItem.byChild(target)
+          setCompleted(todoItem, $(target).prop 'checked')
+
+        @on 'dblclick', @itemText.selector, ({target}) =>
+          todoItem = @todoItem.byChild(target).addClass('edit')
+          @itemField.byParent(todoItem).focus()
+
+        __saveItem = ({target}) =>
+          todoItem = @todoItem.byChild(target).removeClass('edit')
+          updateItem todoItem, $(target).val()
+
+        @on 'blur', @itemField.selector, __saveItem
+        @on 'keyup', @itemField.selector, onEnter __saveItem
+
+        @on 'click', @itemRemove.selector, ({target}) =>
+          removeItem @todoItem.byChild(target)
+
+        setFilter('all')
+        updateStats()
+
+        {setFilter, addItem, updateItem, setCompleted, removeItem, setFilter}
+    </script>
+  </body>
+</html>
