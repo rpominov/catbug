@@ -1,5 +1,5 @@
 /*! catbug.js 0.1.1
- *  2013-05-20 05:31:37 +0400
+ *  2013-05-20 21:12:48 +0400
  *  https://github.com/pozadi/catbug.js
  */
 
@@ -237,6 +237,14 @@ catbug.ns('core', function(ns, top) {
       return this.filter(function() {
         return $.contains(parent, this);
       });
+    },
+    live: function(types, data, fn) {
+      $(this.context).on(types, this.selector, data, fn);
+      return this;
+    },
+    die: function(types, fn) {
+      $(this.context).off(types, this.selector, fn);
+      return this;
     }
   };
   ns.builderContextMixin = {
@@ -273,8 +281,9 @@ catbug.ns('core', function(ns, top) {
     }
 
     Module.prototype.buildElement = function(selector, context) {
-      context = domEl(context);
-      return _.extend($(selector, context), ns.elementMixin);
+      return _.extend($(selector, context), {
+        selector: selector
+      }, ns.elementMixin);
     };
 
     Module.prototype.buildElements = function(context) {

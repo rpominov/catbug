@@ -200,11 +200,11 @@
         @setFilterButton.click ({target}) =>
           setFilter $(target).data('filter')
 
-        @on 'change', @itemCheckbox.selector, ({target}) =>
+        @itemCheckbox.live 'change', ({target}) =>
           todoItem = @todoItem.byChild(target)
           setCompleted(todoItem, $(target).prop 'checked')
 
-        @on 'dblclick', @itemText.selector, ({target}) =>
+        @itemText.live 'dblclick', ({target}) =>
           todoItem = @todoItem.byChild(target).addClass('edit')
           @itemField.byParent(todoItem).focus()
 
@@ -212,10 +212,10 @@
           todoItem = @todoItem.byChild(target).removeClass('edit')
           updateItem todoItem, $(target).val()
 
-        @on 'blur', @itemField.selector, __saveItem
-        @on 'keyup', @itemField.selector, onEnter __saveItem
+        @itemField.live 'blur', __saveItem
+        @itemField.live 'keyup', onEnter __saveItem
 
-        @on 'click', @itemRemove.selector, ({target}) =>
+        @itemRemove.live 'click', ({target}) =>
           removeItem @todoItem.byChild(target)
 
         setFilter('all')

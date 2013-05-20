@@ -16,6 +16,14 @@ catbug.ns 'core', (ns, top) ->
     byParent: (parent) ->
       parent = domEl parent
       @filter -> $.contains parent, @
+    # .live(), .die() methods and .selector property was removed from jQuery
+    # for serious reasons, but all that reasons are invalid in catbug
+    live: (types, data, fn) ->
+      $(@context).on types, @selector, data, fn
+      @
+    die: (types, fn) ->
+      $(@context).off types, @selector, fn
+      @
 
   ns.builderContextMixin =
     update: (names) ->
@@ -29,10 +37,7 @@ catbug.ns 'core', (ns, top) ->
     constructor: (@name, @rootSelector, @elements, @builder) ->
 
     buildElement: (selector, context) ->
-      # convert `context` into DOM element to clear its `.selector` property
-      # this is necessary for safety use of `@element.selector`
-      context = domEl context
-      _.extend $(selector, context), ns.elementMixin
+      _.extend $(selector, context), {selector}, ns.elementMixin
 
     buildElements: (context) ->
       result = {}
