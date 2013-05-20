@@ -1,5 +1,8 @@
 catbug.ns 'core', (ns, top) ->
 
+  domEl = (el) ->
+    if el.jquery then el.get(0) else el
+
   ns.instances = {}
 
   ns.elementMixin =
@@ -8,10 +11,10 @@ catbug.ns 'core', (ns, top) ->
       @push el for el in $(@selector, @context)
       @
     byChild: (child) ->
-      child = child.get(0) if child.jquery
+      child = domEl child
       @filter -> $.contains @, child
     byParent: (parent) ->
-      parent = parent.get(0) if parent.jquery
+      parent = domEl parent
       @filter -> $.contains parent, @
 
   ns.builderContextMixin =
@@ -26,6 +29,9 @@ catbug.ns 'core', (ns, top) ->
     constructor: (@name, @rootSelector, @elements, @builder) ->
 
     buildElement: (selector, context) ->
+      # convert `context` into DOM element to clear its `.selector` property
+      # this is necessary for safety use of `@element.selector`
+      context = domEl context
       _.extend $(selector, context), ns.elementMixin
 
     buildElements: (context) ->
