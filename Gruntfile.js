@@ -43,7 +43,7 @@ module.exports = function(grunt) {
 
     watch: {
       development: {
-        files: 'src/*',
+        files: ['src/*', 'package.json'],
         tasks: ['default']
       }
     },

@@ -2,7 +2,7 @@
   "name": "catbug.js",
   "version": "0.1.2",
   "description": "everything is okay",
-  "homepage": "https://github.com/pozadi/catbug.js",
+  "homepage": "http://github.com/pozadi/catbug",
   "scripts": {},
   "devDependencies": {
     "grunt": "~0.4.1",

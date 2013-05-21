@@ -1,6 +1,6 @@
-/*! catbug.js 0.1.1
- *  2013-05-21 23:52:00 +0400
- *  https://github.com/pozadi/catbug.js
+/*! catbug.js 0.1.2
+ *  2013-05-22 01:44:39 +0400
+ *  http://github.com/pozadi/catbug
  */
 
 
