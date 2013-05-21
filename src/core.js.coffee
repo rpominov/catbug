@@ -65,7 +65,8 @@ catbug.ns 'core', (ns, top) ->
       el = $ el
       dataKey = "catbug-#{@name}"
       unless el.data dataKey
-        el.data dataKey, @builder.call @builderContext(el)
+        context = @builderContext(el)
+        el.data dataKey, @builder.call(context, context)
       el.data dataKey
 
     initAll: =>

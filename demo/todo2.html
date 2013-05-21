@@ -135,53 +135,51 @@
           .js-text
           .js-remove
           .js-field
-      """, "todo-item", ->
+      """, "todo-item", (ns) ->
 
         completedCb = $.Callbacks()
         removedCb = $.Callbacks()
 
-        api = _.extend {}, this, {
+        api =
 
           setText: (text) ->
-            @text.text text
-            @field.val text
+            ns.text.text text
+            ns.field.val text
 
           getText: ->
-            @text.text()
+            ns.text.text()
 
           setCompleted: (completed) ->
-            @removeClass('active completed')
-            @addClass(if completed then 'completed' else 'active')
-            @checkbox.prop 'checked', completed
+            ns.removeClass('active completed')
+            ns.addClass(if completed then 'completed' else 'active')
+            ns.checkbox.prop 'checked', completed
             completedCb.fire completed
 
           getCompleted: ->
-            @checkbox.prop 'checked'
+            ns.checkbox.prop 'checked'
 
           remove: ->
-            @root.remove()
+            ns.root.remove()
             removedCb.fire()
 
           onCompleted: completedCb.add
           onRemoved: removedCb.add
 
-        }
+        ns.checkbox.change ->
+          api.setCompleted ns.checkbox.prop 'checked'
 
-        @checkbox.change =>
-          api.setCompleted @checkbox.prop 'checked'
+        ns.text.dblclick ->
+          ns.addClass('edit')
+          ns.field.focus()
 
-        @text.dblclick =>
-          @addClass('edit')
-          @field.focus()
+        __save = ->
+          ns.removeClass('edit')
+          api.setText ns.field.val()
 
-        __save = =>
-          @removeClass('edit')
-          api.setText @field.val()
+        ns.field.blur __save
+        ns.field.keyup onEnter __save
 
-        @field.blur __save
-        @field.keyup onEnter __save
-
-        @remove.click ->
+        ns.remove.click ->
           api.remove()
 
         api

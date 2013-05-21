@@ -1,5 +1,5 @@
 /*! catbug.js 0.1.1
- *  2013-05-21 23:45:29 +0400
+ *  2013-05-21 23:52:00 +0400
  *  https://github.com/pozadi/catbug.js
  */
 
@@ -315,12 +315,13 @@ catbug.ns('core', function(ns, top) {
     };
 
     Module.prototype.init = function(el) {
-      var dataKey;
+      var context, dataKey;
 
       el = $(el);
       dataKey = "catbug-" + this.name;
       if (!el.data(dataKey)) {
-        el.data(dataKey, this.builder.call(this.builderContext(el)));
+        context = this.builderContext(el);
+        el.data(dataKey, this.builder.call(context, context));
       }
       return el.data(dataKey);
     };
