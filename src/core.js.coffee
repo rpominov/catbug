@@ -31,6 +31,13 @@ catbug.ns 'core', (ns, top) ->
     updateAll: ->
       @[info.name].update() for info in @__elements
 
+  ns.copyMethods = [
+    'find',
+    'on', 'off',
+    'data',
+    'addClass', 'removeClass', 'toggleClass', 'hasClass',
+    'hide', 'show', 'toggle'
+  ]
 
   class ns.Module
 
@@ -47,8 +54,7 @@ catbug.ns 'core', (ns, top) ->
 
     builderContext: (rootEl) ->
       result = {}
-      for method in ['find', 'on', 'off', 'data', 'addClass', 'removeClass',
-                     'toggleClass', 'hide', 'show', 'toggle']
+      for method in ns.copyMethods
         result[method] = _.bind rootEl[method], rootEl
       _.extend result, {
         root: rootEl

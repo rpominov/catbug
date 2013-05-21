@@ -1,5 +1,5 @@
 /*! catbug.js 0.1.1
- *  2013-05-20 21:12:48 +0400
+ *  2013-05-21 23:45:29 +0400
  *  https://github.com/pozadi/catbug.js
  */
 
@@ -271,6 +271,7 @@ catbug.ns('core', function(ns, top) {
       return _results;
     }
   };
+  ns.copyMethods = ['find', 'on', 'off', 'data', 'addClass', 'removeClass', 'toggleClass', 'hasClass', 'hide', 'show', 'toggle'];
   ns.Module = (function() {
     function Module(name, rootSelector, elements, builder) {
       this.name = name;
@@ -302,7 +303,7 @@ catbug.ns('core', function(ns, top) {
       var method, result, _i, _len, _ref;
 
       result = {};
-      _ref = ['find', 'on', 'off', 'data', 'addClass', 'removeClass', 'toggleClass', 'hide', 'show', 'toggle'];
+      _ref = ns.copyMethods;
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         method = _ref[_i];
         result[method] = _.bind(rootEl[method], rootEl);
