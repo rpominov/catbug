@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Catbug demo | ToDo</title>
+
+    <style type="text/css">
+      .todos-widget {
+        width: 500px;
+        margin: 0 auto;
+        font-size: 20px;
+        line-height: 1.5;
+      }
+        .item-list {
+          list-style: none;
+          margin: 0;
+          padding: 0;
+        }
+          .todo-item,
+          .add-form {
+            background: #8ee699;
+            padding: 4px 6px;
+          }
+            .todo-item [type=text],
+            .add-form [type=text] {
+              width: 90%;
+              font-size: 20px;
+              padding: 5px 7px;
+            }
+              .remove {
+                float: right;
+              }
+              .todo-item [type=text] {
+                display: none;
+              }
+              .todo-item.edit .remove,
+              .todo-item.edit .text,
+              .todo-item.edit [type=checkbox] {
+                display: none;
+              }
+              .todo-item.edit [type=text] {
+                display: inline;
+              }
+              .todo-item.completed .text {
+                text-decoration: line-through;
+              }
+            .todos-widget.filter-completed .todo-item.active {
+              display: none;
+            }
+            .todos-widget.filter-active .todo-item.completed {
+              display: none;
+            }
+        .footer {
+          background: #63c26f;
+          margin: 0 4px;
+          font-size: 14px;
+          padding: 5px 7px;
+        }
+          .left {
+            float: left;
+          }
+          .clear-completed {
+            float: right;
+          }
+          .footer-menu {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            text-align: center;
+          }
+            .footer-menu li {
+              display: inline;
+            }
+              .todos-widget.filter-all [data-filter=all] {
+                font-weight: bold;
+              }
+              .todos-widget.filter-completed [data-filter=completed] {
+                font-weight: bold;
+              }
+              .todos-widget.filter-active [data-filter=active] {
+                font-weight: bold;
+              }
+    </style>
+  </head>
+  <body>
+
+    <div class="js-todos-widget todos-widget">
+      <h1>todos</h1>
+
+      <div class="add-form">
+        <input type="checkbox" class="js-all-checkbox">
+        <input type="text" placeholder="What needs to be done?" class="js-new-item">
+      </div>
+
+      <ul class="js-item-list item-list">
+      </ul>
+
+      <div class="footer js-footer">
+        <span class="js-left-counter left"></span>
+
+        <button class="js-clear-completed clear-completed">Clear completed
+          (<span class="js-completed-counter"></span>)</button>
+
+        <ul class="footer-menu">
+          <li><button class="js-set-filter-button" data-filter="all">All</button></li>
+          <li><button class="js-set-filter-button" data-filter="active">Active</button></li>
+          <li><button class="js-set-filter-button" data-filter="completed">Completed</button></li>
+        </ul>
+      </div>
+
+      <script type="text/html" class="js-item-template">
+        <li class="js-todo-item todo-item">
+          <input type="checkbox" class="js-checkbox">
+          <span class="js-text text"></span>
+          <button class="js-remove remove">&times;</button>
+          <input type="text" class="js-field">
+        </li>
+      </script>
+    </div>
+
+    <script src="../components/underscore/underscore.js"></script>
+    <script src="../components/jquery/jquery.js"></script>
+    <script src="../catbug.js"></script>
+
+    <script src="../components/coffee-script/extras/coffee-script.js"></script>
+
+    <script type="text/coffeescript">
+
+      onEnter = (fn) ->
+        (e) -> fn.apply(@, arguments) if e.which == 13
+
+      catbug """
+        .js-todo-item
+          .js-checkbox
+          .js-text
+          .js-remove
+          .js-field
+      """, "todo-item", ->
+
+        completedCb = $.Callbacks()
+        removedCb = $.Callbacks()
+
+        api = _.extend {}, this, {
+
+          setText: (text) ->
+            @text.text text
+            @field.val text
+
+          getText: ->
+            @text.text()
+
+          setCompleted: (completed) ->
+            @removeClass('active completed')
+            @addClass(if completed then 'completed' else 'active')
+            @checkbox.prop 'checked', completed
+            completedCb.fire completed
+
+          getCompleted: ->
+            @checkbox.prop 'checked'
+
+          remove: ->
+            @root.remove()
+            removedCb.fire()
+
+          onCompleted: completedCb.add
+          onRemoved: removedCb.add
+
+        }
+
+        @checkbox.change =>
+          api.setCompleted @checkbox.prop 'checked'
+
+        @text.dblclick =>
+          @addClass('edit')
+          @field.focus()
+
+        __save = =>
+          @removeClass('edit')
+          api.setText @field.val()
+
+        @field.blur __save
+        @field.keyup onEnter __save
+
+        @remove.click ->
+          api.remove()
+
+        api
+
+
+      catbug """
+        .js-todos-widget
+          .js-all-checkbox
+          .js-new-item
+          .js-item-list
+            .js-todo-item
+          .js-footer
+            .js-left-counter
+            .js-clear-completed
+              .js-completed-counter
+            .js-set-filter-button
+          .js-item-template
+      """, ->
+
+        itemTpl = $.trim @itemTemplate.html()
+
+        addItem = (text) =>
+          el = $ itemTpl
+          @itemList.append el
+          @todoItem.update()
+          item = el.catbug 'todo-item'
+          item.setText text
+          item.setCompleted false
+          item.onRemoved =>
+            updateStats()
+            @todoItem.update()
+          item.onCompleted updateStats
+          updateStats()
+
+        setFilter = (filter) =>
+          @removeClass('filter-completed filter-active filter-all')
+          @addClass("filter-#{filter}")
+
+        items = (onlyCompleted=false) =>
+          item for el in @todoItem when (
+            item = $(el).catbug 'todo-item'
+            not onlyCompleted or item.getCompleted()
+          )
+
+        updateStats = =>
+          all = items().length
+          completed = items(true).length
+          active = all - completed
+
+          @footer.toggle(all > 0)
+          @clearCompleted.toggle(completed > 0)
+          @completedCounter.text(completed)
+          @leftCounter.text("#{active} #{if active == 1 then 'item' else 'items'} left")
+
+        @newItem.keyup onEnter =>
+          addItem @newItem.val()
+          @newItem.val('')
+
+        @allCheckbox.change =>
+          completed = @allCheckbox.prop('checked')
+          item.setCompleted(completed) for item in items()
+
+        @clearCompleted.click =>
+          item.remove() for item in items(true)
+
+        @setFilterButton.click ({target}) =>
+          setFilter $(target).data('filter')
+
+        setFilter('all')
+        updateStats()
+
+    </script>
+  </body>
+</html>
+
