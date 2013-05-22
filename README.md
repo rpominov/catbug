@@ -1,5 +1,7 @@
 # Catbug
 
+[Введение в Catbug](http://pozadi.github.io/2013/05/23/introduction-to-catbug.html)
+
 Catbug уменьшает рутину в coffeescript. Он работает следующим образом:
 
   1. описываете деревце
