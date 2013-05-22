@@ -1,6 +1,8 @@
 # Catbug
 
-[Введение в Catbug](http://pozadi.github.io/2013/05/23/introduction-to-catbug.html)
+В статье
+["Ведение в Catbug"](http://pozadi.github.io/2013/05/23/introduction-to-catbug.html)
+рассказывается зачем он нужен.
 
 Catbug уменьшает рутину в coffeescript. Он работает следующим образом:
 
