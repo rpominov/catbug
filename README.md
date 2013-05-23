@@ -29,7 +29,7 @@ catbug """
     .js-content
 """, ->
   @content.hide()
-  @toggle.click => @conten.toggle()
+  @toggle.click => @content.toggle()
 ```
 
 После объявления модуля, он автоматически инициализируется на всех элементах
