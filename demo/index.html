@@ -28,12 +28,12 @@
     <script type="text/coffeescript">
       catbug """
         .js-my-module
-          button (name=clickable)
+          button {name=clickable}
           .js-content
           ul
             & .item
           .wrap
-            & .item (name=wraped)
+            & .item {name=wraped}
       """, 'my-module', ->
         @content.hide()
         @clickable.click => @content.toggle()

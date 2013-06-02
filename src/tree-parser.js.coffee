@@ -3,9 +3,9 @@ catbug.ns 'treeParser', (ns) ->
   ns.nonEmpty = /\S+/
   ns.indentation = /^\s+/
   ns.selectorAndAttrs = ///^
-    ([^\(]+)
+    ([^\{]+)
     (?:
-      \( (.*?) \)
+      \{ (.*?) \}
     )?
   $///
   ns.attribute = ///

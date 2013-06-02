@@ -1,5 +1,5 @@
 /*! catbug 0.1.2
- *  2013-05-22 01:47:11 +0400
+ *  2013-06-02 22:41:18 +0400
  *  http://github.com/pozadi/catbug
  */
 
@@ -30,7 +30,7 @@ catbug.ns = function(path, cb) {
 catbug.ns('treeParser', function(ns) {
   ns.nonEmpty = /\S+/;
   ns.indentation = /^\s+/;
-  ns.selectorAndAttrs = /^([^\(]+)(?:\((.*?)\))?$/;
+  ns.selectorAndAttrs = /^([^\{]+)(?:\{(.*?)\})?$/;
   ns.attribute = /([a-z_-]+)(?:=(?:"(.*?)"|'(.*?)'|(\S+)))?/;
   ns.attributes = new RegExp(ns.attribute.source, 'g');
   ns.comments = /\/\*[\s\S]*?\*\/|\/\/.*/g;
