@@ -37,12 +37,12 @@ catbug """
 при этом, доступны все элементы из дерева.
 
 Имя каждого элемента вычисляется из селектора, но может быть задано вручную
-(`.some-selector (name=foo)`):
+(`.some-selector {name=foo}`):
 
     .js-toggle                     ->  @toggle
     .toggle span                   ->  @toggleSpan
     input[type=text]               ->  @inputTypeText
-    input[type=text] (name=field)  ->  @field
+    input[type=text] {name=field}  ->  @field
 
 Корневой элемент доступен в инициализаторе под именем `@root`.
 
@@ -133,6 +133,9 @@ jQuery. Причины по которым они были удалены из j
 <script src=".../catbug.js"></script>
 ```
 
+Можно установить с помощью [bower](http://bower.io/)
+
+    bower install git://github.com/pozadi/catbug.git -save
 
 ## Разработка
 
