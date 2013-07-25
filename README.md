@@ -135,7 +135,7 @@ jQuery. Причины по которым они были удалены из j
 
 Можно установить с помощью [bower](http://bower.io/)
 
-    bower install git://github.com/pozadi/catbug.git -save
+    bower install catbug -save
 
 ## Разработка
 
