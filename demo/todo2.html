@@ -209,8 +209,8 @@
           item.setText text
           item.setCompleted false
           item.onRemoved =>
-            updateStats()
             @todoItem.update()
+            updateStats()
           item.onCompleted updateStats
           updateStats()
 
