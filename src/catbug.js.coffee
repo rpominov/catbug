@@ -1,7 +1,9 @@
+# = require _intro
 # = require_self
 # = require tree-parser
 # = require jquery-plugin
 # = require core
+# = require _outro
 
 window.catbug = ->
   catbug.core.module.apply catbug, arguments

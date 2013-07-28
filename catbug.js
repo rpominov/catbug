@@ -1,7 +1,13 @@
 /*! catbug 0.1.3
- *  2013-06-02 22:47:38 +0400
+ *  2013-07-28 10:26:04 +0400
  *  http://github.com/pozadi/catbug
  */
+
+
+/***  src/_intro  ***/
+
+;(function(window){
+;
 
 
 /***  src/catbug  ***/
@@ -375,3 +381,9 @@ catbug.ns('core', function(ns, top) {
     return result;
   };
 });
+
+
+/***  src/_outro  ***/
+
+}(this));
+
