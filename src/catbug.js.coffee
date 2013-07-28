@@ -8,7 +8,7 @@
 # = require core
 # = require _outro
 
-window.catbug = ->
+window.catbug = catbug = ->
   catbug.core.module.apply catbug, arguments
 
 catbug.ns = (path, cb) ->

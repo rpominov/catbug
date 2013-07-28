@@ -1,5 +1,5 @@
 /*! catbug 0.1.4
- *  2013-07-28 12:08:19 +0400
+ *  2013-07-28 12:11:40 +0400
  *  http://github.com/pozadi/catbug
  */
 
@@ -12,7 +12,9 @@
 
 /***  src/catbug  ***/
 
-window.catbug = function() {
+var catbug;
+
+window.catbug = catbug = function() {
   return catbug.core.module.apply(catbug, arguments);
 };
 
