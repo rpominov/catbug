@@ -1,5 +1,5 @@
 /*! catbug 0.1.3
- *  2013-07-28 11:47:59 +0400
+ *  2013-07-28 12:03:36 +0400
  *  http://github.com/pozadi/catbug
  */
 
@@ -244,6 +244,41 @@ catbug.ns('jquerySub', function(ns, top) {
 
 
 
+/***  src/builder-context  ***/
+
+catbug.ns('builderContext', function(ns, top) {
+  ns.jQuery = top.jquerySub.sub();
+  ns.jQuery.prototype.update = function(names) {
+    var name, _i, _len, _ref, _results;
+
+    _ref = names.split(' ');
+    _results = [];
+    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+      name = _ref[_i];
+      _results.push(this[name].update());
+    }
+    return _results;
+  };
+  ns.jQuery.prototype.updateAll = function() {
+    var info, _i, _len, _ref, _results;
+
+    _ref = this.__elements;
+    _results = [];
+    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+      info = _ref[_i];
+      _results.push(this[info.name].update());
+    }
+    return _results;
+  };
+  return ns.create = function(root, elements) {
+    return _.extend(ns.jQuery(root), {
+      root: root,
+      __elements: elements
+    }, elements);
+  };
+});
+
+
 /***  src/element  ***/
 
 catbug.ns('element', function(ns, top) {
@@ -288,7 +323,7 @@ catbug.ns('element', function(ns, top) {
     $(this.context).off(types, this.selector, fn);
     return this;
   };
-  return ns.Element = function(selector, context) {
+  return ns.create = function(selector, context) {
     return _.extend(ns.jQuery(selector, context), {
       selector: selector
     });
@@ -302,31 +337,6 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
 
 catbug.ns('core', function(ns, top) {
   ns.instances = {};
-  ns.builderContextMixin = {
-    update: function(names) {
-      var name, _i, _len, _ref, _results;
-
-      _ref = names.split(' ');
-      _results = [];
-      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-        name = _ref[_i];
-        _results.push(this[name].update());
-      }
-      return _results;
-    },
-    updateAll: function() {
-      var info, _i, _len, _ref, _results;
-
-      _ref = this.__elements;
-      _results = [];
-      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-        info = _ref[_i];
-        _results.push(this[info.name].update());
-      }
-      return _results;
-    }
-  };
-  ns.copyMethods = ['find', 'on', 'off', 'data', 'addClass', 'removeClass', 'toggleClass', 'hasClass', 'hide', 'show', 'toggle'];
   ns.Module = (function() {
     function Module(name, rootSelector, elements, builder) {
       this.name = name;
@@ -343,24 +353,9 @@ catbug.ns('core', function(ns, top) {
       _ref = this.elements;
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         info = _ref[_i];
-        result[info.name] = top.element.Element(info.selector, context);
+        result[info.name] = top.element.create(info.selector, context);
       }
       return result;
-    };
-
-    Module.prototype.builderContext = function(rootEl) {
-      var method, result, _i, _len, _ref;
-
-      result = {};
-      _ref = ns.copyMethods;
-      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-        method = _ref[_i];
-        result[method] = _.bind(rootEl[method], rootEl);
-      }
-      return _.extend(result, {
-        root: rootEl,
-        __elements: this.elements
-      }, ns.builderContextMixin, this.buildElements(rootEl));
     };
 
     Module.prototype.init = function(el) {
@@ -369,7 +364,7 @@ catbug.ns('core', function(ns, top) {
       el = $(el);
       dataKey = "catbug-" + this.name;
       if (!el.data(dataKey)) {
-        context = this.builderContext(el);
+        context = top.builderContext.create(el, this.buildElements(el));
         el.data(dataKey, this.builder.call(context, context));
       }
       return el.data(dataKey);

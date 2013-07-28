@@ -3,6 +3,7 @@
 # = require tree-parser
 # = require jquery-plugin
 # = require jquery-sub
+# = require builder-context
 # = require element
 # = require core
 # = require _outro

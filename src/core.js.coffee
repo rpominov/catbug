@@ -2,20 +2,6 @@ catbug.ns 'core', (ns, top) ->
 
   ns.instances = {}
 
-  ns.builderContextMixin =
-    update: (names) ->
-      @[name].update() for name in names.split ' '
-    updateAll: ->
-      @[info.name].update() for info in @__elements
-
-  ns.copyMethods = [
-    'find',
-    'on', 'off',
-    'data',
-    'addClass', 'removeClass', 'toggleClass', 'hasClass',
-    'hide', 'show', 'toggle'
-  ]
-
   class ns.Module
 
     constructor: (@name, @rootSelector, @elements, @builder) ->
@@ -23,23 +9,14 @@ catbug.ns 'core', (ns, top) ->
     buildElements: (context) ->
       result = {}
       for info in @elements
-        result[info.name] = top.element.Element(info.selector, context)
+        result[info.name] = top.element.create(info.selector, context)
       result
-
-    builderContext: (rootEl) ->
-      result = {}
-      for method in ns.copyMethods
-        result[method] = _.bind rootEl[method], rootEl
-      _.extend result, {
-        root: rootEl
-        __elements: @elements
-      }, ns.builderContextMixin, @buildElements rootEl
 
     init: (el) ->
       el = $ el
       dataKey = "catbug-#{@name}"
       unless el.data dataKey
-        context = @builderContext(el)
+        context = top.builderContext.create(el, @buildElements el)
         el.data dataKey, @builder.call(context, context)
       el.data dataKey
 

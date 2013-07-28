@@ -31,5 +31,5 @@ catbug.ns 'element', (ns, top) ->
     @
 
 
-  ns.Element = (selector, context) ->
+  ns.create = (selector, context) ->
     _.extend ns.jQuery(selector, context), {selector}
