@@ -1,29 +1,6 @@
 catbug.ns 'core', (ns, top) ->
 
-  domEl = (el) ->
-    if el.jquery then el.get(0) else el
-
   ns.instances = {}
-
-  ns.elementMixin =
-    update: ->
-      @splice 0, @length
-      @push el for el in $(@selector, @context)
-      @
-    byChild: (child) ->
-      child = domEl child
-      @filter -> $.contains @, child
-    byParent: (parent) ->
-      parent = domEl parent
-      @filter -> $.contains parent, @
-    # .live(), .die() methods and .selector property was removed from jQuery
-    # for serious reasons, but all that reasons are invalid in catbug
-    live: (types, data, fn) ->
-      $(@context).on types, @selector, data, fn
-      @
-    die: (types, fn) ->
-      $(@context).off types, @selector, fn
-      @
 
   ns.builderContextMixin =
     update: (names) ->
@@ -43,13 +20,10 @@ catbug.ns 'core', (ns, top) ->
 
     constructor: (@name, @rootSelector, @elements, @builder) ->
 
-    buildElement: (selector, context) ->
-      _.extend $(selector, context), {selector}, ns.elementMixin
-
     buildElements: (context) ->
       result = {}
       for info in @elements
-        result[info.name] = @buildElement info.selector, context
+        result[info.name] = top.element.Element(info.selector, context)
       result
 
     builderContext: (rootEl) ->

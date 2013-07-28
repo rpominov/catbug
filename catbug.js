@@ -1,12 +1,12 @@
 /*! catbug 0.1.3
- *  2013-07-28 10:26:04 +0400
+ *  2013-07-28 11:47:59 +0400
  *  http://github.com/pozadi/catbug
  */
 
 
 /***  src/_intro  ***/
 
-;(function(window){
+;(function(window, $, _){
 ;
 
 
@@ -205,11 +205,48 @@ catbug.ns('core', function(ns) {
 });
 
 
-/***  src/core  ***/
+/***  src/jquery-sub  ***/
 
-var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
+/* Here lives .sub() function that was in jQuery one time, but now is removed.
+ *
+ * It creates a new copy of jQuery whose properties and methods can be
+ * modified without affecting the original jQuery object.
+ * http://api.jquery.com/jQuery.sub/
+ *
+ * Code taken from here (we don't need whole plugin):
+ *   https://github.com/jquery/jquery-migrate/blob/master/src/core.js#L89-109
+ */
 
-catbug.ns('core', function(ns, top) {
+
+catbug.ns('jquerySub', function(ns, top) {
+
+  ns.sub = function() {
+    function jQuerySub( selector, context ) {
+      return new jQuerySub.fn.init( selector, context );
+    }
+    $.extend( true, jQuerySub, $ );
+    jQuerySub.superclass = $;
+    jQuerySub.fn = jQuerySub.prototype = $();
+    jQuerySub.fn.constructor = jQuerySub;
+    jQuerySub.fn.init = function init( selector, context ) {
+      if ( context && context instanceof jQuery && !(context instanceof jQuerySub) ) {
+        context = jQuerySub( context );
+      }
+
+      return $.fn.init.call( this, selector, context, rootjQuerySub );
+    };
+    jQuerySub.fn.init.prototype = jQuerySub.fn;
+    var rootjQuerySub = jQuerySub(document);
+    return jQuerySub;
+  };
+
+});
+
+
+
+/***  src/element  ***/
+
+catbug.ns('element', function(ns, top) {
   var domEl;
 
   domEl = function(el) {
@@ -219,40 +256,52 @@ catbug.ns('core', function(ns, top) {
       return el;
     }
   };
-  ns.instances = {};
-  ns.elementMixin = {
-    update: function() {
-      var el, _i, _len, _ref;
+  ns.jQuery = top.jquerySub.sub();
+  ns.jQuery.prototype.update = function() {
+    var el, _i, _len, _ref;
 
-      this.splice(0, this.length);
-      _ref = $(this.selector, this.context);
-      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-        el = _ref[_i];
-        this.push(el);
-      }
-      return this;
-    },
-    byChild: function(child) {
-      child = domEl(child);
-      return this.filter(function() {
-        return $.contains(this, child);
-      });
-    },
-    byParent: function(parent) {
-      parent = domEl(parent);
-      return this.filter(function() {
-        return $.contains(parent, this);
-      });
-    },
-    live: function(types, data, fn) {
-      $(this.context).on(types, this.selector, data, fn);
-      return this;
-    },
-    die: function(types, fn) {
-      $(this.context).off(types, this.selector, fn);
-      return this;
+    this.splice(0, this.length);
+    _ref = $(this.selector, this.context);
+    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+      el = _ref[_i];
+      this.push(el);
     }
+    return this;
   };
+  ns.jQuery.prototype.byChild = function(child) {
+    child = domEl(child);
+    return this.filter(function() {
+      return $.contains(this, child);
+    });
+  };
+  ns.jQuery.prototype.byParent = function(parent) {
+    parent = domEl(parent);
+    return this.filter(function() {
+      return $.contains(parent, this);
+    });
+  };
+  ns.jQuery.prototype.live = function(types, data, fn) {
+    $(this.context).on(types, this.selector, data, fn);
+    return this;
+  };
+  ns.jQuery.prototype.die = function(types, fn) {
+    $(this.context).off(types, this.selector, fn);
+    return this;
+  };
+  return ns.Element = function(selector, context) {
+    return _.extend(ns.jQuery(selector, context), {
+      selector: selector
+    });
+  };
+});
+
+
+/***  src/core  ***/
+
+var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
+
+catbug.ns('core', function(ns, top) {
+  ns.instances = {};
   ns.builderContextMixin = {
     update: function(names) {
       var name, _i, _len, _ref, _results;
@@ -287,12 +336,6 @@ catbug.ns('core', function(ns, top) {
       this.initAll = __bind(this.initAll, this);
     }
 
-    Module.prototype.buildElement = function(selector, context) {
-      return _.extend($(selector, context), {
-        selector: selector
-      }, ns.elementMixin);
-    };
-
     Module.prototype.buildElements = function(context) {
       var info, result, _i, _len, _ref;
 
@@ -300,7 +343,7 @@ catbug.ns('core', function(ns, top) {
       _ref = this.elements;
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         info = _ref[_i];
-        result[info.name] = this.buildElement(info.selector, context);
+        result[info.name] = top.element.Element(info.selector, context);
       }
       return result;
     };
@@ -385,5 +428,5 @@ catbug.ns('core', function(ns, top) {
 
 /***  src/_outro  ***/
 
-}(this));
+}(this, this.jQuery, this._));
 

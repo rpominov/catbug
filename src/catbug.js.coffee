@@ -2,6 +2,8 @@
 # = require_self
 # = require tree-parser
 # = require jquery-plugin
+# = require jquery-sub
+# = require element
 # = require core
 # = require _outro
 
