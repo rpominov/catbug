@@ -1,5 +1,5 @@
 /*! catbug 0.1.6
- *  2013-07-30 17:41:29 +0400
+ *  2013-07-30 17:48:46 +0400
  *  http://github.com/pozadi/catbug
  */
 
@@ -179,7 +179,7 @@ catbug.ns('elementMeta', function(ns, top) {
   ns.selectorToName = function(selector) {
     return $.camelCase(selector.replace(/[^a-z0-9]+/ig, '-').replace(/^-/, '').replace(/-$/, '').replace(/^js-/, ''));
   };
-  ns.genName = function(element) {
+  ns.getName = function(element) {
     if (element.attributes.name) {
       return element.attributes.name;
     } else {
@@ -193,7 +193,7 @@ catbug.ns('elementMeta', function(ns, top) {
     for (_i = 0, _len = elements.length; _i < _len; _i++) {
       element = elements[_i];
       element.selector = element.selector.replace('&', (_ref = element.parent) != null ? _ref.selector : void 0);
-      element.name = ns.genName(element);
+      element.name = ns.getName(element);
     }
     roots = _.where(elements, {
       level: 0

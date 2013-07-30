@@ -9,7 +9,7 @@ catbug.ns 'elementMeta', (ns, top) ->
       .replace(/^js-/, '')
 
 
-  ns.genName = (element) ->
+  ns.getName = (element) ->
     if element.attributes.name
       element.attributes.name
     else
@@ -21,7 +21,7 @@ catbug.ns 'elementMeta', (ns, top) ->
 
     for element in elements
       element.selector = element.selector.replace '&', element.parent?.selector
-      element.name = ns.genName element
+      element.name = ns.getName element
 
     roots = _.where elements, {level: 0}
 
