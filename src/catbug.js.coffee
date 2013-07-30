@@ -1,6 +1,7 @@
 # = require _intro
 # = require_self
 # = require tree-parser
+# = require element-meta
 # = require jquery-plugin
 # = require jquery-sub
 # = require builder-context

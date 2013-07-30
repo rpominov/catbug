@@ -1,5 +1,5 @@
 /*! catbug 0.1.5
- *  2013-07-28 12:21:32 +0400
+ *  2013-07-30 17:36:04 +0400
  *  http://github.com/pozadi/catbug
  */
 
@@ -36,23 +36,25 @@ catbug.ns = function(path, cb) {
 /***  src/tree-parser  ***/
 
 catbug.ns('treeParser', function(ns) {
-  ns.nonEmpty = /\S+/;
-  ns.indentation = /^\s+/;
-  ns.selectorAndAttrs = /^([^\{]+)(?:\{(.*?)\})?$/;
-  ns.attribute = /([a-z_-]+)(?:=(?:"(.*?)"|'(.*?)'|(\S+)))?/;
-  ns.attributes = new RegExp(ns.attribute.source, 'g');
-  ns.comments = /\/\*[\s\S]*?\*\/|\/\/.*/g;
-  ns.parseToRaw = function(treeString) {
+  ns.regExps = {
+    nonEmpty: /\S+/,
+    indentation: /^\s+/,
+    selectorAndAttrs: /^([^\{]+)(?:\{(.*?)\})?$/,
+    attribute: /([a-z_-]+)(?:=(?:"(.*?)"|'(.*?)'|(\S+)))?/,
+    comments: /\/\*[\s\S]*?\*\/|\/\/.*/g
+  };
+  ns.regExps.attributes = new RegExp(ns.regExps.attribute.source, 'g');
+  ns.parseTree = function(treeString) {
     var getLevel, getRoots, lines, nonEmpty, normalize;
 
     nonEmpty = function(str) {
-      return ns.nonEmpty.test(str);
+      return ns.regExps.nonEmpty.test(str);
     };
     getLevel = function(line) {
       var _ref;
 
       return {
-        level: ((_ref = ns.indentation.exec(line)) != null ? _ref[0].length : void 0) || 0,
+        level: ((_ref = ns.regExps.indentation.exec(line)) != null ? _ref[0].length : void 0) || 0,
         data: $.trim(line)
       };
     };
@@ -106,10 +108,38 @@ catbug.ns('treeParser', function(ns) {
       addCurrent();
       return result;
     };
-    treeString = treeString.replace(ns.comments, '');
+    treeString = treeString.replace(ns.regExps.comments, '');
     lines = _.chain(treeString.split('\n')).filter(nonEmpty).map(getLevel).value();
     normalize(lines);
     return getRoots(lines, null);
+  };
+  ns.parseLine = function(line) {
+    var parts;
+
+    parts = ns.regExps.selectorAndAttrs.exec(line);
+    if (!parts) {
+      throw new Error('wrong syntax');
+    }
+    return {
+      selector: $.trim(parts[1]),
+      attributes: ns.parseAttributes(parts[2])
+    };
+  };
+  ns.parseAttributes = function(attributes) {
+    var attr, name, result, tmp, value, _i, _len, _ref;
+
+    result = {};
+    if (attributes) {
+      _ref = attributes.match(ns.regExps.attributes);
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        attr = _ref[_i];
+        tmp = ns.regExps.attribute.exec(attr);
+        name = tmp[1];
+        value = tmp[4] || tmp[3] || tmp[2];
+        result[name] = value;
+      }
+    }
+    return result;
   };
   ns.flat = function(roots) {
     var add, result;
@@ -129,65 +159,52 @@ catbug.ns('treeParser', function(ns) {
     add(roots);
     return result;
   };
-  ns.parseAttributes = function(attributes) {
-    var attr, name, result, tmp, value, _i, _len, _ref;
+  return ns.parse = function(treeString) {
+    var line, lines, _i, _len, _results;
 
-    result = {};
-    if (attributes) {
-      _ref = attributes.match(ns.attributes);
-      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-        attr = _ref[_i];
-        tmp = ns.attribute.exec(attr);
-        name = tmp[1];
-        value = tmp[4] || tmp[3] || tmp[2];
-        result[name] = value;
-      }
+    lines = ns.flat(ns.parseTree(treeString));
+    _results = [];
+    for (_i = 0, _len = lines.length; _i < _len; _i++) {
+      line = lines[_i];
+      _results.push(_.extend(line, ns.parseLine(line.data)));
     }
-    return result;
+    return _results;
   };
-  ns.parseLine = function(line) {
-    var parts;
+});
 
-    parts = ns.selectorAndAttrs.exec(line);
-    if (!parts) {
-      throw new Error('wrong syntax');
-    }
-    return {
-      selector: $.trim(parts[1]),
-      attributes: ns.parseAttributes(parts[2])
-    };
-  };
+
+/***  src/element-meta  ***/
+
+catbug.ns('elementMeta', function(ns, top) {
   ns.selectorToName = function(selector) {
     return $.camelCase(selector.replace(/[^a-z0-9]+/ig, '-').replace(/^-/, '').replace(/-$/, '').replace(/^js-/, ''));
   };
   ns.genName = function(element) {
     if (element.attributes.name) {
-      return element.name = element.attributes.name;
+      return element.attributes.name;
     } else {
-      return element.name = ns.selectorToName(element.selector);
+      return ns.selectorToName(element.selector);
     }
   };
-  return ns.parse = function(treeString) {
-    var element, elements, raw, _i, _len, _ref;
+  return ns.getInfos = function(treeString) {
+    var element, elements, root, roots, _i, _len, _ref;
 
-    raw = ns.parseToRaw(treeString);
-    if (raw.length !== 1) {
-      throw new Error('more than one root');
-    }
-    elements = ns.flat(raw);
+    elements = top.treeParser.parse(treeString);
     for (_i = 0, _len = elements.length; _i < _len; _i++) {
       element = elements[_i];
-      _.extend(element, ns.parseLine(element.data));
       element.selector = element.selector.replace('&', (_ref = element.parent) != null ? _ref.selector : void 0);
+      element.name = ns.genName(element);
     }
-    _.each(elements, ns.genName);
+    roots = _.where(elements, {
+      level: 0
+    });
+    if (roots.length > 1) {
+      throw new Error('more than one root');
+    }
+    root = roots[0];
     return {
-      root: _.findWhere(elements, {
-        level: 0
-      }),
-      elements: _.filter(elements, function(e) {
-        return e.level > 0;
-      })
+      root: root,
+      elements: _.without(elements, root)
     };
   };
 });
@@ -388,14 +405,14 @@ catbug.ns('core', function(ns, top) {
 
   })();
   ns.module = function(tree, name, builder) {
-    var module;
+    var elementInfos, module;
 
     if (builder == null) {
       builder = name;
       name = _.uniqueId('lambda-');
     }
-    tree = top.treeParser.parse(tree);
-    ns.instances[name] = module = new ns.Module(name, tree.root.selector, tree.elements, builder);
+    elementInfos = top.elementMeta.getInfos(tree);
+    ns.instances[name] = module = new ns.Module(name, elementInfos.root.selector, elementInfos.elements, builder);
     return $(module.initAll);
   };
   top.init = function(names) {

@@ -30,12 +30,12 @@ catbug.ns 'core', (ns, top) ->
       builder = name
       name = _.uniqueId 'lambda-'
 
-    tree = top.treeParser.parse tree
+    elementInfos = top.elementMeta.getInfos tree
 
     ns.instances[name] = module = new ns.Module(
       name,
-      tree.root.selector,
-      tree.elements,
+      elementInfos.root.selector,
+      elementInfos.elements,
       builder
     )
 
