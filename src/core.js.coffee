@@ -56,5 +56,3 @@ catbug.ns 'core', (ns, top) ->
     for name, module of ns.instances
       result[name] = module.initAll()
     result
-
-

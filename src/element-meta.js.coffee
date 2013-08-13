@@ -34,5 +34,3 @@ catbug.ns 'elementMeta', (ns, top) ->
     root = roots[0]
 
     return {root, elements: _.without(elements, root)}
-
-
