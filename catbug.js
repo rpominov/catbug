@@ -1,5 +1,5 @@
 /*! catbug 0.1.7
- *  2013-08-14 00:46:42 +0400
+ *  2013-08-14 01:53:55 +0400
  *  http://github.com/pozadi/catbug
  */
 
@@ -89,7 +89,19 @@ catbug.ns('treeParser', function(ns) {
     for (_i = 0, _len = lines.length; _i < _len; _i++) {
       line = lines[_i];
       level = getLevel(line);
+      if (level > currentLevel) {
+        if (identStep === null) {
+          identStep = level - currentLevel;
+        }
+        if (level - currentLevel !== identStep) {
+          throw new Error('wrong ident step');
+        }
+        currentBranch = lastBranch;
+      }
       if (level < currentLevel) {
+        if (identStep === null) {
+          throw new Error('unexpected indent');
+        }
         diff = currentLevel - level;
         if (diff % identStep !== 0) {
           throw new Error('wrong ident step');
@@ -101,15 +113,6 @@ catbug.ns('treeParser', function(ns) {
             throw new Error('unexpected indent');
           }
         }
-      }
-      if (level > currentLevel) {
-        if (!identStep) {
-          identStep = level - currentLevel;
-        }
-        if (level - currentLevel !== identStep) {
-          throw new Error('wrong ident step');
-        }
-        currentBranch = lastBranch;
       }
       currentLevel = level;
       lastBranch = new ns.Branch(currentBranch, $.trim(line));

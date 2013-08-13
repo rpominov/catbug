@@ -57,7 +57,17 @@ catbug.ns 'treeParser', (ns) ->
 
     for line in lines
       level = getLevel line
+
+      if level > currentLevel
+        if identStep is null
+          identStep = level - currentLevel
+        if level - currentLevel isnt identStep
+          throw new Error 'wrong ident step'
+        currentBranch = lastBranch
+
       if level < currentLevel
+        if identStep is null
+          throw new Error 'unexpected indent'
         diff = currentLevel - level
         if diff % identStep isnt 0
           throw new Error 'wrong ident step'
@@ -66,12 +76,7 @@ catbug.ns 'treeParser', (ns) ->
           currentBranch = currentBranch.parent
           if currentBranch == null
             throw new Error 'unexpected indent'
-      if level > currentLevel
-        if not identStep
-          identStep = level - currentLevel
-        if level - currentLevel isnt identStep
-          throw new Error 'wrong ident step'
-        currentBranch = lastBranch
+
       currentLevel = level
       lastBranch = new ns.Branch currentBranch, $.trim(line)
       currentBranch.append lastBranch

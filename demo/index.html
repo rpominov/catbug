@@ -56,6 +56,24 @@
               level3-a
           level1-b
       """
+
+      try
+        catbug.treeParser.parseTree """
+            level0-a
+          level1-a
+        """
+      catch e
+        console.log "should be 'unexpected ident':", e.message
+
+      try
+        catbug.treeParser.parseTree """
+            level1-a
+              level2-a
+          level0-a
+        """
+      catch e
+        console.log "should be 'unexpected ident':", e.message
+
     </script>
   </body>
 </html>
