@@ -46,7 +46,7 @@ catbug.ns 'treeParser', (ns) ->
     lines = _.filter lines, nonEmpty
 
     if lines.length == 0
-      return []
+      return {roots: [], flat: []}
 
     currentBranch = new ns.Branch null, null
     roots = currentBranch.children

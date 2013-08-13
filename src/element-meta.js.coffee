@@ -23,6 +23,9 @@ catbug.ns 'elementMeta', (ns, top) ->
       element.selector = element.selector.replace '&', element.parent?.selector
       element.name = ns.getName element
 
+    if elements.length is 0
+      throw new Error 'there is no tree'
+
     roots = _.where elements, {parent: null}
 
     if roots.length > 1

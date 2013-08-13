@@ -1,5 +1,5 @@
 /*! catbug 0.1.6
- *  2013-08-14 00:21:00 +0400
+ *  2013-08-14 00:32:08 +0400
  *  http://github.com/pozadi/catbug
  */
 
@@ -75,7 +75,10 @@ catbug.ns('treeParser', function(ns) {
     lines = treeString.split('\n');
     lines = _.filter(lines, nonEmpty);
     if (lines.length === 0) {
-      return [];
+      return {
+        roots: [],
+        flat: []
+      };
     }
     currentBranch = new ns.Branch(null, null);
     roots = currentBranch.children;
@@ -185,6 +188,9 @@ catbug.ns('elementMeta', function(ns, top) {
       element = elements[_i];
       element.selector = element.selector.replace('&', (_ref = element.parent) != null ? _ref.selector : void 0);
       element.name = ns.getName(element);
+    }
+    if (elements.length === 0) {
+      throw new Error('there is no tree');
     }
     roots = _.where(elements, {
       parent: null
