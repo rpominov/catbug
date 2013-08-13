@@ -6,7 +6,7 @@ catbug.ns 'core', (ns, top) ->
 
     constructor: (@name, @rootSelector, @elements, @builder) ->
 
-    buildElements: (context) ->
+    _buildElements: (context) ->
       result = {}
       for info in @elements
         result[info.name] = top.element.create(info.selector, context)
@@ -16,7 +16,7 @@ catbug.ns 'core', (ns, top) ->
       el = $ el
       dataKey = "catbug-#{@name}"
       unless el.data dataKey
-        context = top.builderContext.create(el, @buildElements el)
+        context = top.builderContext.create(el, @_buildElements el)
         el.data dataKey, @builder.call(context, context)
       el.data dataKey
 
@@ -40,6 +40,8 @@ catbug.ns 'core', (ns, top) ->
     )
 
     $ module.initAll
+
+    module
 
   top.init = (names) ->
     if _.isString names
