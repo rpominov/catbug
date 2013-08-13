@@ -23,7 +23,7 @@ catbug.ns 'elementMeta', (ns, top) ->
       element.selector = element.selector.replace '&', element.parent?.selector
       element.name = ns.getName element
 
-    roots = _.where elements, {level: 0}
+    roots = _.where elements, {parent: null}
 
     if roots.length > 1
       throw new Error 'more than one root'

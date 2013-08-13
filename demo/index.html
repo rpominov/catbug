@@ -48,6 +48,14 @@
           bar (foo=bar bar="baz" baz='foo' alone)
           baz (foo="bar baz" bar baz="foo='foo'")
       """
+
+      console.log catbug.treeParser.parseTree """
+        level0-a
+          level1-a
+            level2-a
+              level3-a
+          level1-b
+      """
     </script>
   </body>
 </html>
