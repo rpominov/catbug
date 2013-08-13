@@ -42,8 +42,10 @@ catbug.ns 'core', (ns, top) ->
     $ module.initAll
 
   top.init = (names) ->
+    if _.isString names
+      names = names.split ' '
     result = {}
-    for name in names.split ' '
+    for name in names
       result[name] = ns.instances[name].initAll()
     result
 
