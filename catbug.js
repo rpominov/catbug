@@ -1,5 +1,5 @@
 /*! catbug 0.1.6
- *  2013-08-14 00:32:08 +0400
+ *  2013-08-14 00:40:02 +0400
  *  http://github.com/pozadi/catbug
  */
 
@@ -265,12 +265,14 @@ catbug.ns('jquerySub', function(ns, top) {
 catbug.ns('builderContext', function(ns, top) {
   ns.jQuery = top.jquerySub.sub();
   ns.jQuery.prototype.update = function(names) {
-    var name, _i, _len, _ref, _results;
+    var name, _i, _len, _results;
 
-    _ref = names.split(' ');
+    if (_.isString(names)) {
+      names = names.split(' ');
+    }
     _results = [];
-    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-      name = _ref[_i];
+    for (_i = 0, _len = names.length; _i < _len; _i++) {
+      name = names[_i];
       _results.push(this[name].update());
     }
     return _results;
@@ -362,7 +364,7 @@ catbug.ns('core', function(ns, top) {
       this.initAll = __bind(this.initAll, this);
     }
 
-    Module.prototype.buildElements = function(context) {
+    Module.prototype._buildElements = function(context) {
       var info, result, _i, _len, _ref;
 
       result = {};
@@ -380,7 +382,7 @@ catbug.ns('core', function(ns, top) {
       el = $(el);
       dataKey = "catbug-" + this.name;
       if (!el.data(dataKey)) {
-        context = top.builderContext.create(el, this.buildElements(el));
+        context = top.builderContext.create(el, this._buildElements(el));
         el.data(dataKey, this.builder.call(context, context));
       }
       return el.data(dataKey);
@@ -410,15 +412,18 @@ catbug.ns('core', function(ns, top) {
     }
     elementInfos = top.elementMeta.getInfos(tree);
     ns.instances[name] = module = new ns.Module(name, elementInfos.root.selector, elementInfos.elements, builder);
-    return $(module.initAll);
+    $(module.initAll);
+    return module;
   };
   top.init = function(names) {
-    var name, result, _i, _len, _ref;
+    var name, result, _i, _len;
 
+    if (_.isString(names)) {
+      names = names.split(' ');
+    }
     result = {};
-    _ref = names.split(' ');
-    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-      name = _ref[_i];
+    for (_i = 0, _len = names.length; _i < _len; _i++) {
+      name = names[_i];
       result[name] = ns.instances[name].initAll();
     }
     return result;
