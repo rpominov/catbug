@@ -1,5 +1,5 @@
 /*! catbug 0.1.8
- *  2013-08-14 01:55:51 +0400
+ *  2013-08-14 14:11:35 +0400
  *  http://github.com/pozadi/catbug
  */
 
@@ -54,22 +54,22 @@ catbug.ns('treeParser', function(ns) {
   nonEmpty = function(str) {
     return ns.regExps.nonEmpty.test(str);
   };
-  ns.Branch = (function() {
-    function Branch(parent, data) {
-      this.parent = parent;
-      this.data = data;
+  ns.TreeNode = (function() {
+    function TreeNode(data) {
+      this.data = data != null ? data : null;
       this.children = [];
     }
 
-    Branch.prototype.append = function(item) {
+    TreeNode.prototype.append = function(item) {
+      item.parent = this;
       return this.children.push(item);
     };
 
-    return Branch;
+    return TreeNode;
 
   })();
   ns.parseTree = function(treeString) {
-    var currentBranch, currentLevel, diff, flat, identStep, lastBranch, level, line, lines, root, roots, _i, _j, _len, _len1;
+    var currentLevel, currentNode, diff, flat, identStep, lastNode, level, line, lines, root, roots, _i, _j, _len, _len1;
 
     treeString = treeString.replace(ns.regExps.comments, '');
     lines = treeString.split('\n');
@@ -80,10 +80,10 @@ catbug.ns('treeParser', function(ns) {
         flat: []
       };
     }
-    currentBranch = new ns.Branch(null, null);
-    roots = currentBranch.children;
+    currentNode = new ns.TreeNode;
+    roots = currentNode.children;
     currentLevel = getLevel(lines[0]);
-    lastBranch = null;
+    lastNode = null;
     flat = [];
     identStep = null;
     for (_i = 0, _len = lines.length; _i < _len; _i++) {
@@ -96,7 +96,7 @@ catbug.ns('treeParser', function(ns) {
         if (level - currentLevel !== identStep) {
           throw new Error('wrong ident step');
         }
-        currentBranch = lastBranch;
+        currentNode = lastNode;
       }
       if (level < currentLevel) {
         if (identStep === null) {
@@ -108,16 +108,16 @@ catbug.ns('treeParser', function(ns) {
         }
         while (diff >= identStep) {
           diff -= identStep;
-          currentBranch = currentBranch.parent;
-          if (currentBranch === null) {
+          currentNode = currentNode.parent;
+          if (currentNode === null) {
             throw new Error('unexpected indent');
           }
         }
       }
       currentLevel = level;
-      lastBranch = new ns.Branch(currentBranch, $.trim(line));
-      currentBranch.append(lastBranch);
-      flat.push(lastBranch);
+      lastNode = new ns.TreeNode($.trim(line));
+      currentNode.append(lastNode);
+      flat.push(lastNode);
     }
     for (_j = 0, _len1 = roots.length; _j < _len1; _j++) {
       root = roots[_j];

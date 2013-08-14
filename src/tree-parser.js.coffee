@@ -33,10 +33,11 @@ catbug.ns 'treeParser', (ns) ->
     ns.regExps.nonEmpty.test str
 
 
-  class ns.Branch
-    constructor: (@parent, @data) ->
+  class ns.TreeNode
+    constructor: (@data = null) ->
       @children = []
     append: (item) ->
+      item.parent = this
       @children.push item
 
 
@@ -48,10 +49,10 @@ catbug.ns 'treeParser', (ns) ->
     if lines.length == 0
       return {roots: [], flat: []}
 
-    currentBranch = new ns.Branch null, null
-    roots = currentBranch.children
+    currentNode = new ns.TreeNode
+    roots = currentNode.children
     currentLevel = getLevel lines[0]
-    lastBranch = null
+    lastNode = null
     flat = []
     identStep = null
 
@@ -63,7 +64,7 @@ catbug.ns 'treeParser', (ns) ->
           identStep = level - currentLevel
         if level - currentLevel isnt identStep
           throw new Error 'wrong ident step'
-        currentBranch = lastBranch
+        currentNode = lastNode
 
       if level < currentLevel
         if identStep is null
@@ -73,14 +74,14 @@ catbug.ns 'treeParser', (ns) ->
           throw new Error 'wrong ident step'
         while (diff >= identStep)
           diff -= identStep
-          currentBranch = currentBranch.parent
-          if currentBranch == null
+          currentNode = currentNode.parent
+          if currentNode == null
             throw new Error 'unexpected indent'
 
       currentLevel = level
-      lastBranch = new ns.Branch currentBranch, $.trim(line)
-      currentBranch.append lastBranch
-      flat.push lastBranch
+      lastNode = new ns.TreeNode $.trim(line)
+      currentNode.append lastNode
+      flat.push lastNode
 
     for root in roots
       root.parent = null
