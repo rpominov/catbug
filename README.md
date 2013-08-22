@@ -1,6 +1,6 @@
 # Catbug
 
-В статье
+> В статье
 ["Ведение в Catbug"](http://pozadi.github.io/2013/05/23/introduction-to-catbug.html)
 рассказывается зачем он нужен.
 
