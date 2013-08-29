@@ -1,16 +1,8 @@
 /*! catbug 0.1.8
- *  2013-08-14 14:11:35 +0400
+ *  2013-08-29 16:44:12 +0400
  *  http://github.com/pozadi/catbug
  */
-
-
-/***  src/_intro  ***/
-
 ;(function(window, $, _){
-;
-
-
-/***  src/catbug  ***/
 
 var catbug;
 
@@ -31,9 +23,6 @@ catbug.ns = function(path, cb) {
   }
   return cb(node, this);
 };
-
-
-/***  src/tree-parser  ***/
 
 catbug.ns('treeParser', function(ns) {
   var getLevel, nonEmpty;
@@ -169,9 +158,6 @@ catbug.ns('treeParser', function(ns) {
   };
 });
 
-
-/***  src/element-meta  ***/
-
 catbug.ns('elementMeta', function(ns, top) {
   ns.selectorToName = function(selector) {
     return $.camelCase(selector.replace(/[^a-z0-9]+/ig, '-').replace(/^-/, '').replace(/-$/, '').replace(/^js-/, ''));
@@ -209,9 +195,6 @@ catbug.ns('elementMeta', function(ns, top) {
   };
 });
 
-
-/***  src/jquery-plugin  ***/
-
 catbug.ns('core', function(ns) {
   return jQuery.prototype.catbug = function(name) {
     var el;
@@ -223,9 +206,6 @@ catbug.ns('core', function(ns) {
   };
 });
 
-
-/***  src/jquery-sub  ***/
-
 /* Here lives .sub() function that was in jQuery one time, but now is removed.
  *
  * It creates a new copy of jQuery whose properties and methods can be
@@ -235,7 +215,6 @@ catbug.ns('core', function(ns) {
  * Code taken from here (we don't need whole plugin):
  *   https://github.com/jquery/jquery-migrate/blob/master/src/core.js#L89-109
  */
-
 
 catbug.ns('jquerySub', function(ns, top) {
 
@@ -260,10 +239,6 @@ catbug.ns('jquerySub', function(ns, top) {
   };
 
 });
-
-
-
-/***  src/builder-context  ***/
 
 catbug.ns('builderContext', function(ns, top) {
   ns.jQuery = top.jquerySub.sub();
@@ -298,9 +273,6 @@ catbug.ns('builderContext', function(ns, top) {
     }, elements);
   };
 });
-
-
-/***  src/element  ***/
 
 catbug.ns('element', function(ns, top) {
   var domEl;
@@ -350,9 +322,6 @@ catbug.ns('element', function(ns, top) {
     });
   };
 });
-
-
-/***  src/core  ***/
 
 var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
@@ -444,8 +413,4 @@ catbug.ns('core', function(ns, top) {
   };
 });
 
-
-/***  src/_outro  ***/
-
 }(this, this.jQuery, this._));
-
