@@ -13,12 +13,12 @@ Catbug уменьшает рутину в CoffeeScript. Он работает с
 Например у вас есть HTML:
 
 ```html
-<div class=js-spoiler>
-  <button class=js-toggle>скрыть/показать</button>
-  <p class=js-content>контент контент контент</p>
+<div class="js-spoiler">
+  <button class="js-toggle">скрыть/показать</button>
+  <p class="js-content">контент контент контент</p>
 </div>
 
-<div class=js-spoiler>
+<div class="js-spoiler">
   <!-- еще один блок ... -->
 </div>
 ```
