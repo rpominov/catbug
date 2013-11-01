@@ -1,5 +1,5 @@
-/*! catbug 0.1.8
- *  2013-08-29 16:44:12 +0400
+/*! catbug 0.2.0
+ *  2013-11-02 01:10:52 +0400
  *  http://github.com/pozadi/catbug
  */
 ;(function(window, $, _){
@@ -241,36 +241,46 @@ catbug.ns('jquerySub', function(ns, top) {
 });
 
 catbug.ns('builderContext', function(ns, top) {
-  ns.jQuery = top.jquerySub.sub();
-  ns.jQuery.prototype.update = function(names) {
-    var name, _i, _len, _results;
+  var BuilderContext;
 
-    if (_.isString(names)) {
-      names = names.split(' ');
+  BuilderContext = (function() {
+    function BuilderContext(el, root) {
+      this.el = el;
+      this.root = root;
+      this.el.root = this.root;
     }
-    _results = [];
-    for (_i = 0, _len = names.length; _i < _len; _i++) {
-      name = names[_i];
-      _results.push(this[name].update());
-    }
-    return _results;
-  };
-  ns.jQuery.prototype.updateAll = function() {
-    var info, _i, _len, _ref, _results;
 
-    _ref = this.__elements;
-    _results = [];
-    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-      info = _ref[_i];
-      _results.push(this[info.name].update());
-    }
-    return _results;
-  };
+    BuilderContext.prototype.update = function(names) {
+      var name, _i, _len, _results;
+
+      if (_.isString(names)) {
+        names = names.split(' ');
+        _results = [];
+        for (_i = 0, _len = names.length; _i < _len; _i++) {
+          name = names[_i];
+          _results.push(this.el[name].update());
+        }
+        return _results;
+      }
+    };
+
+    BuilderContext.prototype.updateAll = function() {
+      var el, _i, _len, _ref, _results;
+
+      _ref = this.el;
+      _results = [];
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        el = _ref[_i];
+        _results.push(el.update());
+      }
+      return _results;
+    };
+
+    return BuilderContext;
+
+  })();
   return ns.create = function(root, elements) {
-    return _.extend(ns.jQuery(root), {
-      root: root,
-      __elements: elements
-    }, elements);
+    return new BuilderContext(elements, root);
   };
 });
 

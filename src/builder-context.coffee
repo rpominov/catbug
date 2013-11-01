@@ -1,14 +1,17 @@
 catbug.ns 'builderContext', (ns, top) ->
 
-  ns.jQuery = top.jquerySub.sub()
+  class BuilderContext
 
-  ns.jQuery::update = (names) ->
-    if _.isString names
-      names = names.split ' '
-    @[name].update() for name in names
+    constructor: (@el, @root) ->
+      @el.root = @root
 
-  ns.jQuery::updateAll = ->
-    @[info.name].update() for info in @__elements
+    update: (names) ->
+      if _.isString names
+        names = names.split ' '
+        @el[name].update() for name in names
+
+    updateAll: ->
+      el.update() for el in @el
 
   ns.create = (root, elements) ->
-    _.extend ns.jQuery(root), {root, __elements: elements}, elements
+    new BuilderContext(elements, root)

@@ -148,24 +148,24 @@
           (e) -> fn.apply(@, arguments) if e.which == 13
 
         itemSubTree = 'todoItem itemCheckbox itemText itemRemove itemField'
-        itemTpl = $.trim @itemTemplate.html()
+        itemTpl = $.trim @el.itemTemplate.html()
 
         addItem = (text) =>
           todoItem = $(itemTpl)
-          @itemList.append(todoItem)
+          @el.itemList.append(todoItem)
           @update itemSubTree
           updateItem(todoItem, text)
           setCompleted(todoItem, false)
 
         updateItem = (todoItem, text) =>
-          @itemText.byParent(todoItem).text text
-          @itemField.byParent(todoItem).val text
+          @el.itemText.byParent(todoItem).text text
+          @el.itemField.byParent(todoItem).val text
 
         setCompleted = (todoItem, completed) =>
           $(todoItem)
             .removeClass('active completed')
             .addClass(if completed then 'completed' else 'active')
-          @itemCheckbox.byParent(todoItem).prop 'checked', completed
+          @el.itemCheckbox.byParent(todoItem).prop 'checked', completed
           updateStats()
 
         removeItem = (todoItem) =>
@@ -174,49 +174,49 @@
           updateStats()
 
         setFilter = (filter) =>
-          @removeClass('filter-completed filter-active filter-all')
-          @addClass("filter-#{filter}")
+          @root.removeClass('filter-completed filter-active filter-all')
+          @root.addClass("filter-#{filter}")
 
         updateStats = =>
-          all = @todoItem.length
-          completed = @todoItem.filter('.completed').length
+          all = @el.todoItem.length
+          completed = @el.todoItem.filter('.completed').length
           active = all - completed
-          @footer.toggle(all > 0)
-          @clearCompleted.toggle(completed > 0)
-          @completedCounter.text(completed)
-          @leftCounter.text("#{active} #{if active == 1 then 'item' else 'items'} left")
+          @el.footer.toggle(all > 0)
+          @el.clearCompleted.toggle(completed > 0)
+          @el.completedCounter.text(completed)
+          @el.leftCounter.text("#{active} #{if active == 1 then 'item' else 'items'} left")
 
-        @newItem.keyup onEnter =>
-          addItem @newItem.val()
-          @newItem.val('')
+        @el.newItem.keyup onEnter =>
+          addItem @el.newItem.val()
+          @el.newItem.val('')
 
-        @allCheckbox.change =>
-          completed = @allCheckbox.prop('checked')
-          setCompleted(todoItem, completed) for todoItem in @todoItem
+        @el.allCheckbox.change =>
+          completed = @el.allCheckbox.prop('checked')
+          setCompleted(todoItem, completed) for todoItem in @el.todoItem
 
-        @clearCompleted.click =>
-          removeItem(todoItem) for todoItem in @todoItem.filter('.completed')
+        @el.clearCompleted.click =>
+          removeItem(todoItem) for todoItem in @el.todoItem.filter('.completed')
 
-        @setFilterButton.click ({target}) =>
+        @el.setFilterButton.click ({target}) =>
           setFilter $(target).data('filter')
 
-        @itemCheckbox.live 'change', ({target}) =>
-          todoItem = @todoItem.byChild(target)
+        @el.itemCheckbox.live 'change', ({target}) =>
+          todoItem = @el.todoItem.byChild(target)
           setCompleted(todoItem, $(target).prop 'checked')
 
-        @itemText.live 'dblclick', ({target}) =>
-          todoItem = @todoItem.byChild(target).addClass('edit')
-          @itemField.byParent(todoItem).focus()
+        @el.itemText.live 'dblclick', ({target}) =>
+          todoItem = @el.todoItem.byChild(target).addClass('edit')
+          @el.itemField.byParent(todoItem).focus()
 
         __saveItem = ({target}) =>
-          todoItem = @todoItem.byChild(target).removeClass('edit')
+          todoItem = @el.todoItem.byChild(target).removeClass('edit')
           updateItem todoItem, $(target).val()
 
-        @itemField.live 'blur', __saveItem
-        @itemField.live 'keyup', onEnter __saveItem
+        @el.itemField.live 'blur', __saveItem
+        @el.itemField.live 'keyup', onEnter __saveItem
 
-        @itemRemove.live 'click', ({target}) =>
-          removeItem @todoItem.byChild(target)
+        @el.itemRemove.live 'click', ({target}) =>
+          removeItem @el.todoItem.byChild(target)
 
         setFilter('all')
         updateStats()

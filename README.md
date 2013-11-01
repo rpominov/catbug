@@ -31,8 +31,8 @@ catbug """
     .js-toggle
     .js-content
 """, ->
-  @content.hide()
-  @toggle.click => @content.toggle()
+  @el.content.hide()
+  @el.toggle.click => @el.content.toggle()
 ```
 
 После объявления модуля, он автоматически инициализируется на всех элементах
@@ -42,12 +42,12 @@ catbug """
 Имя каждого элемента вычисляется из селектора, но может быть задано вручную
 (`.some-selector {name=foo}`):
 
-    .js-toggle                     ->  @toggle
-    .toggle span                   ->  @toggleSpan
-    input[type=text]               ->  @inputTypeText
-    input[type=text] {name=field}  ->  @field
+    .js-toggle                     ->  @el.toggle
+    .toggle span                   ->  @el.toggleSpan
+    input[type=text]               ->  @el.inputTypeText
+    input[type=text] {name=field}  ->  @el.field
 
-Корневой элемент доступен в инициализаторе под именем `@root`.
+Корневой элемент доступен в инициализаторе под именем `@root` или `@el.root`.
 
 
 ## Имя модуля
@@ -101,9 +101,9 @@ $('.js-some').catbug 'my-module' # инициализируем "my-module" на
 есть дополнительные функции.
 
 ```coffee
-@element.update()                # повторяет выборку
-@element.byParent(parent)        # возвращает элементы являющиеся детьми parent
-@element.byChild(child)          # возвращает элементы содержащие child
+@el.foo.update()                 # повторяет выборку
+@el.foo.byParent(parent)         # возвращает элементы являющиеся детьми parent
+@el.foo.byChild(child)           # возвращает элементы содержащие child
 ```
 
 У каждого элемента в catbug есть методы `.live()` и `.die()` как в старом
@@ -112,9 +112,9 @@ jQuery. Причины по которым они были удалены из j
 селекторы указанные в дереве.
 
 ```coffee
-@foo.selector                    # вернет селектор элемента @foo указанный в дереве
-@foo.live('click', fn)           # тоже что и @root.on('click', @foo.selector, fn)
-@foo.die('click', fn)            # тоже что и @root.off('click', @foo.selector, fn)
+@el.foo.selector                 # вернет селектор элемента @el.foo указанный в дереве
+@el.foo.live('click', fn)        # тоже что и @root.on('click', @el.foo.selector, fn)
+@el.foo.die('click', fn)         # тоже что и @root.off('click', @el.foo.selector, fn)
 ```
 
 Если нужно обновить несколько элементов, можно
@@ -150,3 +150,8 @@ jQuery. Причины по которым они были удалены из j
 
     grunt watch &
     open demo/index.html
+
+
+## История
+
+ - 0.2.0 Елементы перенесены из `@someElement` в `@el.someElement`

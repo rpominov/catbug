@@ -143,20 +143,20 @@
         api =
 
           setText: (text) ->
-            ns.text.text text
-            ns.field.val text
+            ns.el.text.text text
+            ns.el.field.val text
 
           getText: ->
-            ns.text.text()
+            ns.el.text.text()
 
           setCompleted: (completed) ->
-            ns.removeClass('active completed')
-            ns.addClass(if completed then 'completed' else 'active')
-            ns.checkbox.prop 'checked', completed
+            ns.root.removeClass('active completed')
+            ns.root.addClass(if completed then 'completed' else 'active')
+            ns.el.checkbox.prop 'checked', completed
             completedCb.fire completed
 
           getCompleted: ->
-            ns.checkbox.prop 'checked'
+            ns.el.checkbox.prop 'checked'
 
           remove: ->
             ns.root.remove()
@@ -165,21 +165,21 @@
           onCompleted: completedCb.add
           onRemoved: removedCb.add
 
-        ns.checkbox.change ->
-          api.setCompleted ns.checkbox.prop 'checked'
+        ns.el.checkbox.change ->
+          api.setCompleted ns.el.checkbox.prop 'checked'
 
-        ns.text.dblclick ->
-          ns.addClass('edit')
-          ns.field.focus()
+        ns.el.text.dblclick ->
+          ns.root.addClass('edit')
+          ns.el.field.focus()
 
         __save = ->
-          ns.removeClass('edit')
-          api.setText ns.field.val()
+          ns.root.removeClass('edit')
+          api.setText ns.el.field.val()
 
-        ns.field.blur __save
-        ns.field.keyup onEnter __save
+        ns.el.field.blur __save
+        ns.el.field.keyup onEnter __save
 
-        ns.remove.click ->
+        ns.el.remove.click ->
           api.remove()
 
         api
@@ -199,54 +199,55 @@
           .js-item-template
       """, ->
 
-        itemTpl = $.trim @itemTemplate.html()
+        itemTpl = $.trim @el.itemTemplate.html()
 
         addItem = (text) =>
           el = $ itemTpl
-          @itemList.append el
-          @todoItem.update()
+          @el.itemList.append el
+          @el.todoItem.update()
           item = el.catbug 'todo-item'
           item.setText text
           item.setCompleted false
           item.onRemoved =>
-            @todoItem.update()
+            @el.todoItem.update()
             updateStats()
           item.onCompleted updateStats
           updateStats()
 
         setFilter = (filter) =>
-          @removeClass('filter-completed filter-active filter-all')
-          @addClass("filter-#{filter}")
+          @root.removeClass('filter-completed filter-active filter-all')
+          @root.addClass("filter-#{filter}")
 
         items = (onlyCompleted=false) =>
-          item for el in @todoItem when (
-            item = $(el).catbug 'todo-item'
-            not onlyCompleted or item.getCompleted()
-          )
+          itemAPIs = @el.todoItem.map -> $(this).catbug('todo-item')
+          if onlyCompleted
+            _.filter itemAPIs, (api) -> api.getCompleted()
+          else
+            itemAPIs
 
         updateStats = =>
           all = items().length
           completed = items(true).length
           active = all - completed
 
-          @footer.toggle(all > 0)
-          @clearCompleted.toggle(completed > 0)
-          @completedCounter.text(completed)
-          @leftCounter.text("#{active} #{if active == 1 then 'item' else 'items'} left")
+          @el.footer.toggle(all > 0)
+          @el.clearCompleted.toggle(completed > 0)
+          @el.completedCounter.text(completed)
+          @el.leftCounter.text("#{active} #{if active == 1 then 'item' else 'items'} left")
 
-        @newItem.keyup onEnter =>
-          addItem @newItem.val()
-          @newItem.val('')
+        @el.newItem.keyup onEnter =>
+          addItem @el.newItem.val()
+          @el.newItem.val('')
 
-        @allCheckbox.change =>
-          completed = @allCheckbox.prop('checked')
+        @el.allCheckbox.change =>
+          completed = @el.allCheckbox.prop('checked')
           item.setCompleted(completed) for item in items()
 
-        @clearCompleted.click =>
+        @el.clearCompleted.click =>
           item.remove() for item in items(true)
 
-        @setFilterButton.click ({target}) =>
-          setFilter $(target).data('filter')
+        @el.setFilterButton.click (ev) =>
+          setFilter $(ev.target).data('filter')
 
         setFilter('all')
         updateStats()
