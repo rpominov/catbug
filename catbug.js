@@ -1,5 +1,5 @@
-/*! catbug 0.2.0
- *  2013-11-02 01:10:52 +0400
+/*! catbug 0.2.1
+ *  2013-11-02 21:02:43 +0400
  *  http://github.com/pozadi/catbug
  */
 ;(function(window, $, _){
@@ -255,13 +255,13 @@ catbug.ns('builderContext', function(ns, top) {
 
       if (_.isString(names)) {
         names = names.split(' ');
-        _results = [];
-        for (_i = 0, _len = names.length; _i < _len; _i++) {
-          name = names[_i];
-          _results.push(this.el[name].update());
-        }
-        return _results;
       }
+      _results = [];
+      for (_i = 0, _len = names.length; _i < _len; _i++) {
+        name = names[_i];
+        _results.push(this.el[name].update());
+      }
+      return _results;
     };
 
     BuilderContext.prototype.updateAll = function() {

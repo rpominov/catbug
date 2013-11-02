@@ -8,7 +8,7 @@ catbug.ns 'builderContext', (ns, top) ->
     update: (names) ->
       if _.isString names
         names = names.split ' '
-        @el[name].update() for name in names
+      @el[name].update() for name in names
 
     updateAll: ->
       el.update() for el in @el
