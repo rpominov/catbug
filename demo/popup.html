@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Catbug demo | Global elements</title>
+
+    <style type="text/css">
+
+      .popup {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,.5);
+      }
+      .popup.visible {
+        display: block;
+      }
+        .popup__content {
+          width: 300px;
+          height: 150px;
+          padding: 20px;
+          margin: 100px auto 0;
+          background: white;
+          box-shadow: 10px 10px rgba(0,0,0,.5);
+        }
+          .popup__close {
+            float: right;
+          }
+
+    </style>
+  </head>
+  <body>
+
+    <button class="js-open-popup" data-id="first-popup">Open first popup</button>
+    <button class="js-open-popup" data-id="second-popup">Open second popup</button>
+
+    <div class="popup js-popup" id="first-popup">
+      <div class="popup__content">
+        <button class="popup__close js-close-popup">&times;</button>
+        <h2>Hello</h2>
+        <p>I am the first popup</p>
+      </div>
+    </div>
+
+    <div class="popup js-popup" id="second-popup">
+      <div class="popup__content">
+        <button class="popup__close js-close-popup">&times;</button>
+        <h2>Hi</h2>
+        <p>I am the second one</p>
+      </div>
+    </div>
+
+
+
+    <script src="../components/underscore/underscore.js"></script>
+    <script src="../components/jquery/jquery.js"></script>
+    <script src="../catbug.js"></script>
+
+    <script src="../components/coffee-script/extras/coffee-script.js"></script>
+
+    <script type="text/coffeescript">
+
+      catbug """
+        .js-popup
+          .js-close-popup {name=closeButton}
+        .js-open-popup {global name=openButton}
+      """, "popup", ->
+
+        @el.closeButton.click =>
+          @el.root.removeClass 'visible'
+
+        @el.openButton.click (e) =>
+          if $(e.target).data('id') is @el.root.attr('id')
+            @el.root.addClass 'visible'
+
+    </script>
+  </body>
+</html>
