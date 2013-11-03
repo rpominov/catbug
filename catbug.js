@@ -1,5 +1,5 @@
-/*! catbug 0.2.1
- *  2013-11-02 21:02:43 +0400
+/*! catbug 0.2.2
+ *  2013-11-03 17:04:10 +0400
  *  http://github.com/pozadi/catbug
  */
 ;(function(window, $, _){
@@ -177,12 +177,13 @@ catbug.ns('elementMeta', function(ns, top) {
       element = elements[_i];
       element.selector = element.selector.replace('&', (_ref = element.parent) != null ? _ref.selector : void 0);
       element.name = ns.getName(element);
+      element.global = 'global' in element.attributes;
     }
     if (elements.length === 0) {
-      throw new Error('there is no tree');
+      throw new Error('there is no elements');
     }
-    roots = _.where(elements, {
-      parent: null
+    roots = _.filter(elements, function(el) {
+      return (el.parent === null) && (!el.global);
     });
     if (roots.length > 1) {
       throw new Error('more than one root');
@@ -326,9 +327,15 @@ catbug.ns('element', function(ns, top) {
     $(this.context).off(types, this.selector, fn);
     return this;
   };
-  return ns.create = function(selector, context) {
+  return ns.create = function(info, defaultContext) {
+    var context, selector;
+
+    selector = info.selector;
+    context = info.global ? window.document : defaultContext;
     return _.extend(ns.jQuery(selector, context), {
-      selector: selector
+      selector: selector,
+      context: context,
+      info: info
     });
   };
 });
@@ -346,14 +353,14 @@ catbug.ns('core', function(ns, top) {
       this.initAll = __bind(this.initAll, this);
     }
 
-    Module.prototype._buildElements = function(context) {
+    Module.prototype._buildElements = function(defaultContext) {
       var info, result, _i, _len, _ref;
 
       result = {};
       _ref = this.elements;
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         info = _ref[_i];
-        result[info.name] = top.element.create(info.selector, context);
+        result[info.name] = top.element.create(info, defaultContext);
       }
       return result;
     };

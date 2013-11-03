@@ -6,10 +6,10 @@ catbug.ns 'core', (ns, top) ->
 
     constructor: (@name, @rootSelector, @elements, @builder) ->
 
-    _buildElements: (context) ->
+    _buildElements: (defaultContext) ->
       result = {}
       for info in @elements
-        result[info.name] = top.element.create(info.selector, context)
+        result[info.name] = top.element.create(info, defaultContext)
       result
 
     init: (el) ->

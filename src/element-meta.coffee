@@ -22,11 +22,13 @@ catbug.ns 'elementMeta', (ns, top) ->
     for element in elements
       element.selector = element.selector.replace '&', element.parent?.selector
       element.name = ns.getName element
+      element.global = 'global' of element.attributes
 
     if elements.length is 0
-      throw new Error 'there is no tree'
+      throw new Error 'there is no elements'
 
-    roots = _.where elements, {parent: null}
+    roots = _.filter elements, (el) ->
+      (el.parent is null) and (not el.global)
 
     if roots.length > 1
       throw new Error 'more than one root'

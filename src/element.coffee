@@ -31,5 +31,7 @@ catbug.ns 'element', (ns, top) ->
     @
 
 
-  ns.create = (selector, context) ->
-    _.extend ns.jQuery(selector, context), {selector}
+  ns.create = (info, defaultContext) ->
+    selector = info.selector
+    context = if info.global then window.document else defaultContext
+    _.extend ns.jQuery(selector, context), {selector, context, info}
